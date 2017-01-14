@@ -108,6 +108,12 @@ function initWorld()
 	planets[0].m_baseVelocity = baseVel/2;
 	planets[7].m_baseVelocity = baseVel/2;
 	
+	for(var planet in planets)
+	{
+		planet.radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
+		planet.angleToSun = 0;
+	}
+	
 	ready = true;
 }
 
