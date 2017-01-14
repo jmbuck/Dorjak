@@ -1,5 +1,8 @@
 var gameSession = null;
 
+var widthToScale = 1920;
+var heightToScale = 1080;
+
 $j(function() { 
 	start();
 });
@@ -20,7 +23,6 @@ function game()
 	this.fps = 60;
 	
 	this.renderObjects = [];
-	this.queuedMessages = [];
 	
 	this.timeElapsed = 0;
 	this.destroyObjects = [];
@@ -43,13 +45,19 @@ game.prototype.init = function()
 	
 	this.logicHandler.postMessage({gameStatus : 'init'});
 	
-	console.log('Some Text');
+	console.log('Finished Loading');
 }
 
 game.prototype.resize = function()
 {
-	this.canvas.width($j(window).innerWidth());
-	this.canvas.height($j(window).innerHeight());
+	var width = $j(window).innerWidth();
+	var height = $j(window).innerHeight();
+	
+	this.canvas.width(width);
+	this.canvas.height(height);
+	
+	this.scaleWidth = width / widthToScale;
+	this.scaleHeight = height / heightToScale;
 }
 
 game.prototype.handleEvent = function(event)
@@ -72,12 +80,12 @@ game.prototype.start_handling = function()
 	});
 }
 
-game.prototype.keyPress(key)
+game.prototype.keyPress = function(key)
 {
 	
 }
 
-game.prototype.keyRelease(key)
+game.prototype.keyRelease = function(key)
 {
 	
 }
