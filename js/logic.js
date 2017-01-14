@@ -58,12 +58,6 @@ function generateAsteroids() {
 }
 
 var baseVel = 100;
-<<<<<<< HEAD
-var baseRad = 50;
-var sun = Box2D.Collision.Shapes.b2CircleShape;
-var planets = [];
-=======
->>>>>>> 7f4129cadc04156d00bcf96cdd957b8715a48379
 
 function initWorld()
 {
