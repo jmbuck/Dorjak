@@ -8,19 +8,24 @@ var asteroids = [];
 var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
-
+var baseVel = 100;
+var key;
+var pressed;
 var loop = function() {
 	if(ready) update();
 }
 
 self.onmessage = function(e)
 {
- if(e.data === "init") {
+ if(e.data.gameStatus === "init") {
 	 initWorld();
+	 pressed = 0;
 	 startTime = d.getTime();
- } else {
-	
+ } else if(e.data.gameStatus === "input")
+	key = e.data.key;
+	pressed = e.data.keyStatus; //1 for pressed, 0 for released
  }
+ 
 }
 function update() {
 	var currTime = d.getTime();
@@ -33,6 +38,8 @@ function generateAsteroids() {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
 	 var minRadius = Math.floor(baseSize / 4);
 	 var maxRadius = baseRadius;
+	 var minVel = Math.floor(baseVel / 2);
+	 var maxVel = Math.floor(baseVel * 2);
 	 for(var i = 0; i < numAsteroids; i++) {
 		 var asteroid = Box2D.Collision.Shapes.b2CircleShape;
 		 
@@ -53,11 +60,11 @@ function generateAsteroids() {
 		 }
 		 
 		 asteroid.m_radius.Set(getRandomInt(minRadius, maxRadius)); //generate size
+		 asteroid.m_velocity.Set(getRandomInt(minVel, maxVel)); //generate velocity
+		 asteroids.push(asteroid);
 	 }
 	
 }
-
-var baseVel = 100;
 
 function initWorld()
 {
@@ -140,11 +147,16 @@ function movePlanets()
 
 
 
+function calculateDistance(a, b) { //returns distance between object a and object b
+	return Math.sqrt((a.m_position.x - b.m_position.x)*(a.m_position.x - b.m_position.x)+
+					  (a.m_position.y - b.m_position.y)*(a.m_position.y - b.m_position.y));
+}
 
-
-
-
-
+function calculateAngle(current, target) {
+	var triangleHeight = current.m_position.y - target.m_position.y;
+	var triangleBase = current.m_position.x - target.m_position.x;
+	return Math.atan(triangleBase/triangleHeight);
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
