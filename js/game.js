@@ -1,6 +1,8 @@
 var gameSession = null;
 
-start();
+$j(function() { 
+	start();
+});
 
 function start()
 {
@@ -31,13 +33,13 @@ game.prototype.init = function()
 	
 	this.resize();
 	
-	this.logicHandler = new Worker('logic.js');
+	this.logicHandler = new Worker("./js/logic.js");
 	
 	this.logicHandler.onmessage = this.handleEvent;
 	
 	this.renderObjects.push(new sun());
 	for(var i = 0; i < 4; i++)
-		this.renderObjects.pust(new planet(i));
+		this.renderObjects.push(new planet(i));
 	
 	this.logicHandler.postMessage({gameStatus : 'init'});
 	
@@ -46,8 +48,8 @@ game.prototype.init = function()
 
 game.prototype.resize = function()
 {
-	this.canvas.width = $(window).innerWidth();
-	this.canvas.height = $(height).innerHeight();
+	this.canvas.width = $j(window).innerWidth();
+	this.canvas.height = $j(window).innerHeight();
 }
 
 game.prototype.handleEvent = function(event)
