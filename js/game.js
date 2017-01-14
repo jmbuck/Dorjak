@@ -21,6 +21,8 @@ function start()
 function game()
 {
 	this.fps = 60;
+	this.on = true;
+	this.paused = false;
 	
 	this.renderObjects = [];
 	this.queuedMessages = [];
@@ -40,13 +42,7 @@ game.prototype.init = function()
 	
 	this.logicHandler.onmessage = this.handleEvent;
 	
-	this.renderObjects.push(new sun());
-	for(var i = 0; i < 4; i++)
-		this.renderObjects.push(new planet(i));
-	
-	this.logicHandler.postMessage({gameStatus : 'init'});
-	
-	this.draw();
+	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps});
 	
 	console.log('Finished Loading');
 }
@@ -63,6 +59,27 @@ game.prototype.resize = function()
 	this.scaleHeight = this.height / heightToScale;
 }
 
+game.prototype.tick = function(cnt)
+{
+	if(this.gameObjects.length > 0)
+	{
+		if(this.paused)
+		{
+			
+		}
+		else
+		{
+			for(var message in this.queuedMessages)
+			{
+				
+			}
+			
+			this.draw();
+		}
+	}
+	this.timer = setTimeout( function() { that.tick(); }  , 1000 / this.fps);
+}
+
 game.prototype.draw = function()
 {
 	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
@@ -73,9 +90,22 @@ game.prototype.draw = function()
 	}
 }
 
-game.prototype.handleEvent = function(event)
+game.prototype.handleEvent = function(e)
 {
-	
+	if(e.data.gameStatus === 'init')
+	{
+		var sunObject = new sun(e.data.sun);
+		
+		this.gameObjects.push(sunObject);
+		
+		for(var i = 0; i < e.data.planets.length; i++)
+		{
+			var planetData = e.data.planets[i];
+			planetData.sun = sunObject;
+			this.gameObjects.push(new planet(planetData));
+		}
+	}
+	this.queuedMessages.push(e.data);
 }
 
 game.prototype.start_handling = function()
@@ -96,9 +126,11 @@ game.prototype.keyRelease = function(e)
 	return false;
 }
 
-function sun()
+function sun(data)
 {
-	
+	this.x = data.x;
+	this.y = data.y;
+	this.radius = data.radius;
 }
 
 sun.prototype.draw = function(context)
@@ -106,9 +138,11 @@ sun.prototype.draw = function(context)
 	
 }
 
-function planet()
+function planet(data)
 {
-	
+	this.sun = data.sun;
+	this.radius = data.radius;
+	this.arc = data.sun;
 }
 
 planet.prototype.draw = function(context)
