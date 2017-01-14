@@ -19,16 +19,16 @@ var loop = function() {
 
 self.onmessage = function(e)
 {
- if(e.data.gameStatus === "init") {
-	 initWorld();
-	 pressed = 0;
-	 startTime = d.getTime();
- } else if(e.data.gameStatus === "input")
+	if(e.data.gameStatus === "init") {
+		initWorld();
+		pressed = 0;
+		startTime = d.getTime();
+	} else if(e.data.gameStatus === "input")
 	key = e.data.key;
 	pressed = e.data.keyStatus; //1 for pressed, 0 for released
- }
- 
 }
+ 
+
 function update() {
 	var currTime = d.getTime();
 	if(currTime - startTime > 1000) {	//asteroid generation
