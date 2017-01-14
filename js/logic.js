@@ -81,30 +81,43 @@ function initWorld()
 			i+= 2;
 		}
 	}
+	planets[3].m_radius = baseRad;
 	planets[4].m_radius = baseRad;
-	planets[7].m_radius = baseRad;
-	planets[3].m_radius = baseRad*1.5;
-	planets[8].m_radius = baseRad*1.5;
-	planets[2].m_radius = baseRad*2.25;
-	planets[9].m_radius = baseRad*2.25;
-	planets[1].m_radius = baseRad*3;
-	planets[10].m_radius = baseRad*3;
+	planets[2].m_radius = baseRad*1.5;
+	planets[5].m_radius = baseRad*1.5;
+	planets[1].m_radius = baseRad*2.25;
+	planets[6].m_radius = baseRad*2.25;
+	planets[0].m_radius = baseRad*3;
+	planets[7].m_radius = baseRad*3;
 	
+	planets[3].m_velocity.Set(baseVel, 0);
 	planets[4].m_velocity.Set(baseVel, 0);
-	planets[7].m_velocity.Set(baseVel, 0);
-	planets[3].m_velocity.Set(-baseVel/1.4, 0);
-	planets[8].m_velocity.Set(-baseVel/1.4, 0);
-	planets[2].m_velocity.Set(baseVel/1.7, 0);
-	planets[9].m_velocity.Set(baseVel/1.7, 0);
-	planets[1].m_velocity.Set(baseVel/2, 0);
-	planets[10].m_velocity.Set(baseVel/2, 0);
+	planets[2].m_velocity.Set(-baseVel/1.4, 0);
+	planets[5].m_velocity.Set(-baseVel/1.4, 0);
+	planets[1].m_velocity.Set(baseVel/1.7, 0);
+	planets[6].m_velocity.Set(baseVel/1.7, 0);
+	planets[0].m_velocity.Set(baseVel/2, 0);
+	planets[7].m_velocity.Set(baseVel/2, 0);
+	
+	planets[3].m_baseVelocity = baseVel;
+	planets[4].m_baseVelocity = baseVel;
+	planets[2].m_baseVelocity = -baseVel/1.4;
+	planets[5].m_baseVelocity = -baseVel/1.4;
+	planets[1].m_baseVelocity = baseVel/1.7;
+	planets[6].m_baseVelocity = baseVel/1.7;
+	planets[0].m_baseVelocity = baseVel/2;
+	planets[7].m_baseVelocity = baseVel/2;
 	
 	ready = true;
 }
 
 function movePlanets()
 {
-	for()
+	for(var planet in planets)
+	{
+		var angle = calculateAngle(planet, sun) + 90;
+		planet.m_velocity.Set(planet.m_baseVelocity*Math.cos(angle), planet.m_baseVelocity*Math.sin(angle);
+	}
 }
 
 
