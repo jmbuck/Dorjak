@@ -105,7 +105,10 @@ game.prototype.handleEvent = function(e)
 			this.gameObjects.push(new planet(planetData));
 		}
 	}
-	this.queuedMessages.push(e.data);
+	else
+	{
+		this.queuedMessages.push(e.data);
+	}
 }
 
 game.prototype.start_handling = function()
@@ -138,6 +141,14 @@ sun.prototype.draw = function(context)
 	var ctx = context.ctx;
 	var scaleWidth = context.width;
 	var scaleHeight = context.height;
+	
+	ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'orange';
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
 }
 
 function planet(data)
