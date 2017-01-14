@@ -23,6 +23,7 @@ function game()
 	this.fps = 60;
 	
 	this.renderObjects = [];
+	this.queuedMessages = [];
 	
 	this.timeElapsed = 0;
 	this.destroyObjects = [];
@@ -30,8 +31,8 @@ function game()
 
 game.prototype.init = function()
 {
-	this.canvas = $j('#canvas');
-	this.ctx = this.canvas.get(0).getContext('2d');
+	this.ctx = $j('#canvas')[0].getContext('2d');
+	this.canvas = this.ctx.canvas;
 	
 	this.resize();
 	
@@ -45,19 +46,31 @@ game.prototype.init = function()
 	
 	this.logicHandler.postMessage({gameStatus : 'init'});
 	
+	this.draw();
+	
 	console.log('Finished Loading');
 }
 
 game.prototype.resize = function()
 {
-	var width = $j(window).innerWidth();
-	var height = $j(window).innerHeight();
+	this.width = $j(window).innerWidth();
+	this.height = $j(window).innerHeight();
 	
-	this.canvas.width(width);
-	this.canvas.height(height);
+	this.canvas.width = this.width;
+	this.canvas.height = this.height;
 	
-	this.scaleWidth = width / widthToScale;
-	this.scaleHeight = height / heightToScale;
+	this.scaleWidth = this.width / widthToScale;
+	this.scaleHeight = this.height / heightToScale;
+}
+
+game.prototype.draw = function()
+{
+	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
+	
+	for(var i = 0; i < this.renderObjects.length; i++)
+	{
+		this.renderObjects[i].draw({context : this.ctx, width : this.scaleWidth, height : this.scaleHeight});
+	}
 }
 
 game.prototype.handleEvent = function(event)
@@ -67,27 +80,20 @@ game.prototype.handleEvent = function(event)
 
 game.prototype.start_handling = function()
 {	
-	$j(document).on('keydown.game' , function(e)
-	{
-		gameSession.keyRelease(e);
-		return false;
-	});
-	
-	$j(document).on('keyup.game' ,function(e)
-	{
-		gameSession.keyPress(e);
-		return false;
-	});
+	$j(document).on('keydown.game', gameSession.keyPress);
+	$j(document).on('keyup.game', gameSession.keyRelease);
 }
 
-game.prototype.keyPress = function(key)
+game.prototype.keyPress = function(e)
 {
-	
+	this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});
+	return false;
 }
 
-game.prototype.keyRelease = function(key)
+game.prototype.keyRelease = function(e)
 {
-	
+	this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
+	return false;
 }
 
 function sun()
@@ -95,7 +101,17 @@ function sun()
 	
 }
 
+sun.prototype.draw = function(context)
+{
+	
+}
+
 function planet()
+{
+	
+}
+
+planet.prototype.draw = function(context)
 {
 	
 }
