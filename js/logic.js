@@ -92,12 +92,25 @@ function initWorld()
 	planets[1].m_velocity.Set(baseVel/2, 0);
 	planets[10].m_velocity.Set(baseVel/2, 0);
 	
+	planets[4].m_baseVelocity = baseVel;
+	planets[7].m_baseVelocity = baseVel;
+	planets[3].m_baseVelocity = -baseVel/1.4;
+	planets[8].m_baseVelocity = -baseVel/1.4;
+	planets[2].m_baseVelocity = baseVel/1.7;
+	planets[9].m_baseVelocity = baseVel/1.7;
+	planets[1].m_baseVelocity = baseVel/2;
+	planets[10].m_baseVelocity = baseVel/2;
+	
 	ready = true;
 }
 
 function movePlanets()
 {
-	for()
+	for(var planet in planets)
+	{
+		var angle = calculateAngle(planet, sun);
+		planet.m_velocity.Set(planet.m_baseVelocity*Math.cos(angle), planet.m_baseVelocity*Math.cos(angle);
+	}
 }
 
 
