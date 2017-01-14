@@ -48,8 +48,8 @@ game.prototype.init = function()
 
 game.prototype.resize = function()
 {
-	this.canvas.width = $j(window).innerWidth();
-	this.canvas.height = $j(window).innerHeight();
+	this.canvas.width($j(window).innerWidth());
+	this.canvas.height($j(window).innerHeight());
 }
 
 game.prototype.handleEvent = function(event)
@@ -61,15 +61,25 @@ game.prototype.start_handling = function()
 {	
 	$j(document).on('keydown.game' , function(e)
 	{
-		gameSession.key_down(e);
+		gameSession.keyRelease(e);
 		return false;
 	});
 	
 	$j(document).on('keyup.game' ,function(e)
 	{
-		gameSession.key_up(e);
+		gameSession.keyPress(e);
 		return false;
 	});
+}
+
+game.prototype.keyPress(key)
+{
+	
+}
+
+game.prototype.keyRelease(key)
+{
+	
 }
 
 function sun()
