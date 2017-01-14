@@ -42,6 +42,8 @@ Object.extend(b2CircleShape.prototype,
 		this.m_position = new b2Vec2();
 		this.m_velocity = new b2Vec2();
 		this.m_baseVelocity = 0;
+		this.radiusFromSun = 0;
+		this.angleToSun = 0;
 		//
 
 		// The constructor for b2Shape
