@@ -3,12 +3,27 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	
+	<style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      border: 0;
+      overflow: hidden; /*  Disable scrollbars */
+      display: block;  /* No floating content on sides */
+    }
+	</style>
+	
 	<title>INSERT TITLE HERE</title>
 	
 	<!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
-	
-    <script src="lib/prototype-1.6.0.2.js"></script>
 
+	<script src='js/prototype.js'></script>
+	<script src='js/jquery-3.1.1.js'></script>
+	<script type="text/javascript">
+        var $j = jQuery.noConflict();
+    </script>
+	
 		<!-- box2djs -->
     <script src='js/box2d/common/b2Settings.js'></script>
     <script src='js/box2d/common/math/b2Vec2.js'></script>
@@ -76,18 +91,10 @@
     <script src='js/box2d/dynamics/joints/b2RevoluteJointDef.js'></script>
 	
 	<!-- game libraries -->
-	<script src="code/init.js"></script>
-	<!-- <script src="code/box2d.js"></script>
-	<script src="code/game.js"></script> -->
+	<script src="js/init.js"></script>
+	<!-- <script src="code/box2d.js"></script> -->
+	<script src="js/game.js"></script>
 
-	<style>
-	* 
-	{
-		margin:0;
-		padding:0;
-	}
-	
-	</style>
 </head>
 	<body>
 		<!-- canvas on which everything is drawn -->
