@@ -6,6 +6,7 @@ var sun = Box2D.Collision.Shapes.b2CircleShape;
 var planets = [];
 var asteroids = [];
 var data = [];
+var asteroidSpawnRate = 2000 //in milliseconds
 var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
@@ -13,9 +14,11 @@ var baseVel = 100;
 var key;
 var thrust;
 var pressed;
+var world;
 var loop = function() {
 	if(ready) update();
 }
+
 
 self.onmessage = function(e)
 {
@@ -30,8 +33,13 @@ self.onmessage = function(e)
  
 }
 function update() {
+	var fps = 60;
+	var timeStep = 1.0/fps;
+	var iterations = 8;
+	world.Step(timeStep, iterations);
+	
 	var currTime = d.getTime();
-	if(currTime - startTime > 1000) {	//asteroid generation
+	if(currTime - startTime > asteroidSpawnRate) {	//asteroid generation
 		startTime = currTime;
 		generateAsteroids();
 	}		
@@ -66,20 +74,27 @@ function generateAsteroids() {
 		var velocity = getRandomInt(minVel, maxVel);
 		asteroid.m_baseVelocity = velocity;
 		asteroid.m_velocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
-		asteroids.push(asteroid);
+		
+		world.createBody(asteroid); //add to world
+		asteroids.push(asteroid); //add to array
 	 }
 	
 }
 
 function initWorld()
 {
+	var gravity = new b2Vec2(0, 0);
+	world = new b2World(gravity, true);
+	
 	sun.m_position.Set(screenWidth/2, screenHeight/2);
 	sun.m_radius = baseRad*5;
+	world.CreateBody(sun);
 	
 	for(var i = 1; i < 11; i++)
 	{
 		var planet = Box2D.Collision.Shapes.b2CircleShape;
 		planet.m_position.Set(screenWidth/2, screenHeight*i/11);
+		world.CreateBody(planet);
 		planets.push(planet);
 		if(i == 4)
 		{
@@ -154,42 +169,6 @@ function movePlanets()
 		planet.angleToSun = planet.angleToSun + angVelocity;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
