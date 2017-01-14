@@ -1,8 +1,8 @@
-setInterval(loop, 1000/60); //60Hz step rate (I assume. 1000/30 is 30Hz)
+
 var ready = false;
 var d = new Date();
 var startTime;
-var sun = Box2D.Collision.Shapes.b2CircleShape;
+var sun;
 var planets = [];
 var asteroids = [];
 var data = [];
@@ -13,9 +13,6 @@ var baseVel = 100;
 var key;
 var thrust;
 var pressed;
-var loop = function() {
-	if(ready) update();
-}
 
 self.onmessage = function(e)
 {
@@ -34,7 +31,8 @@ function update() {
 	if(currTime - startTime > 1000) {	//asteroid generation
 		startTime = currTime;
 		generateAsteroids();
-	}		
+	}
+	this.timer = setTimeout( function() { update(); }  , 1000 / this.fps);
 }
 function generateAsteroids() {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
@@ -73,6 +71,7 @@ function generateAsteroids() {
 
 function initWorld()
 {
+	sun = new b2CircleShape(100);
 	sun.m_position.Set(screenWidth/2, screenHeight/2);
 	sun.m_radius = baseRad*5;
 	
@@ -113,7 +112,7 @@ function initWorld()
 	planets[0].m_baseVelocity = baseVel/2;
 	planets[7].m_baseVelocity = baseVel/2;
 	
-	for(int i = 0; i < 8; i++)
+	for(var i = 0; i < 8; i++)
 	{
 		planets[i].radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
 		if(i <= 3)
@@ -139,7 +138,7 @@ function movePlanets()
 {
 	for(var planet in planets)
 	{
-		if(-selected- && pressed)
+		/*if(-selected- && pressed)
 		{
 			if(-speed-)
 				thrust += 0.2;
@@ -151,7 +150,7 @@ function movePlanets()
 		else if(thrust > 0)
 			thrust -= 0.1;
 		var angVelocity = (planet.m_baseVelocity + thrust*10)/planet.radiusFromSun;
-		planet.angleToSun = planet.angleToSun + angVelocity;
+		planet.angleToSun = planet.angleToSun + angVelocity;*/
 	}
 }
 
