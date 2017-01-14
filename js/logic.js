@@ -5,11 +5,13 @@ var startTime;
 var sun = Box2D.Collision.Shapes.b2CircleShape;
 var planets = [];
 var asteroids = [];
+var data = [];
 var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
 var key;
+var thrust;
 var pressed;
 var loop = function() {
 	if(ready) update();
@@ -111,13 +113,25 @@ function initWorld()
 	planets[0].m_baseVelocity = baseVel/2;
 	planets[7].m_baseVelocity = baseVel/2;
 	
-	for(var planet in planets)
+	for(int i = 0; i < 8; i++)
 	{
-		planet.radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
-		planet.angleToSun = 0;
+		planets[i].radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
+		if(i <= 3)
+		{			
+			planet.angleToSun = 90;
+		}
+		else
+		{
+			planet.angleToSun = 270;
+		}
+		var info = new b2Vec3();
+		info.rad = planets[i].m_radius;
+		info.angle = planets[i].angleToSun;
+		info.dist = planets[i].radiusFromSun;
+		data.push(info);
 	}
 	
-	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : planets});
+	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : data});
 	ready = true;
 }
 
@@ -125,8 +139,19 @@ function movePlanets()
 {
 	for(var planet in planets)
 	{
-		var angle = calculateAngle(planet, sun) + 90;
-		planet.m_velocity.Set(planet.m_baseVelocity*Math.cos(angle), planet.m_baseVelocity*Math.sin(angle);
+		if(-selected- && pressed)
+		{
+			if(-speed-)
+				thrust += 0.2;
+			else if(-slow-)
+				thrust -= 0.2;
+		}
+		else if(thrust < 0)
+			thrust += 0.1;
+		else if(thrust > 0)
+			thrust -= 0.1;
+		var angVelocity = (planet.m_baseVelocity + thrust*10)/planet.radiusFromSun;
+		planet.angleToSun = planet.angleToSun + angVelocity;
 	}
 }
 
