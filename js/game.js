@@ -135,7 +135,9 @@ function sun(data)
 
 sun.prototype.draw = function(context)
 {
-	
+	var ctx = context.ctx;
+	var scaleWidth = context.width;
+	var scaleHeight = context.height;
 }
 
 function planet(data)
