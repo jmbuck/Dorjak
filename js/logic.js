@@ -58,10 +58,13 @@ function generateAsteroids() {
 			 default:
 			 asteroid.m_position.Set(getRandomInt(0, screenWidth), 0);
 		 }
-		 
 		 asteroid.m_radius.Set(getRandomInt(minRadius, maxRadius)); //generate size
-		 asteroid.m_velocity.Set(getRandomInt(minVel, maxVel)); //generate velocity
-		 asteroids.push(asteroid);
+		
+		var angle = calculateAngle(asteroid, sun); //generate velocity
+		var velocity = getRandomInt(minVel, maxVel);
+		asteroid.m_baseVelocity = velocity;
+		asteroid.m_velocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
+		asteroids.push(asteroid);
 	 }
 	
 }
@@ -108,6 +111,13 @@ function initWorld()
 	planets[0].m_baseVelocity = baseVel/2;
 	planets[7].m_baseVelocity = baseVel/2;
 	
+	for(var planet in planets)
+	{
+		planet.radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
+		planet.angleToSun = 0;
+	}
+	
+	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : planets});
 	ready = true;
 }
 
