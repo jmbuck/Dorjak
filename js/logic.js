@@ -311,6 +311,7 @@ function initWorld()
 			console.log("asteroid-asteroid!");
 			var asteroid = asteroids[asteroids.indexOf(fixtureA.GetBody().GetUserData())];
 			console.log("Index fixA "+ asteroids.indexOf(fixtureA.GetBody().GetUserData()));
+			console.log("Index fixB "+ asteroids.indexOf(fixtureB.GetBody().GetUserData()));
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
@@ -321,7 +322,6 @@ function initWorld()
 			//asteroidFixtures.splice(fixtureA, 1);
 			
 			asteroid = asteroids[asteroids.indexOf(fixtureB.GetBody().GetUserData())];
-			console.log("Index fixB "+ asteroids.indexOf(fixtureB.GetBody().GetUserData()));
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
@@ -334,7 +334,7 @@ function initWorld()
 			if(score == 0) score++;
 		}
 		//asteroid collides with planet
-		if((fixtureA.GetBody().GetUserData() instanceof Asteroid && fixtureB.GetBody().GetUserData() instanceof Planet) ||
+		else if((fixtureA.GetBody().GetUserData() instanceof Asteroid && fixtureB.GetBody().GetUserData() instanceof Planet) ||
 		   (fixtureB.GetBody().GetUserData() instanceof Asteroid && fixtureA.GetBody().GetUserData() instanceof Planet)) 
 		{
 			console.log("asteroid-planet!");
@@ -364,10 +364,10 @@ function initWorld()
 			//asteroidFixtures.splice(asteroid.fixtureDef, 1);
 		}
 		//asteroid collides with sun
-		if((fixtureA.GetBody().GetUserData() instanceof Asteroid  && fixtureB.GetBody().GetUserData() instanceof Sun) ||
-		   (fixtureB.GetBody().GetUserData() instanceof Asteroid && fixtureA.GetBody().GetUserData() instanceof Sun)) 
+		else/*((fixtureA.GetBody().GetUserData() instanceof Asteroid  && fixtureB.GetBody().GetUserData() instanceof Sun) ||
+		   (fixtureB.GetBody().GetUserData() instanceof Asteroid && fixtureA.GetBody().GetUserData() instanceof Sun))*/ 
 		{ 
-			console.log("asteroid-sun!");
+		   console.log("asteroid-sun!");
 		   self.postMessage({gameStatus : 'gameover', score: score});
 		   clearInterval(interval);
 		   self.close();
