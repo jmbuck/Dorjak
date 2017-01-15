@@ -31,7 +31,7 @@ var sunBody;
 var planets = [];
 var planetsFixtures = [];
 var asteroids = [];
-var asteroidsFixtures = [];
+var asteroidFixtures = [];
 var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 100;
 var baseDistance = 20;
@@ -112,13 +112,14 @@ function update()
 	
 	if(totalSteps == 60) 
 	{
-		console.log("hello");
 		generateAsteroids();
-		console.log("hello2");
 		totalSteps = 0;
-	} else {
+	} 
+	else 
+	{
 		totalSteps++;
 	}
+	
 	selectOrbit(keyW, keyS);
 	movePlanets(keyA, keyD);
 	
@@ -127,51 +128,68 @@ function update()
 		var fixtureA = contact.GetFixtureA();
 		var fixtureB = contact.GetFixtureB();
 		//asteroid collides with asteroid
-		if(asteroidsFixtures.indexOf(fixtureA) != -1 && asteroidsFixtures.indexOf(fixtureB) != -1)  {
-			var asteroid1 = asteroidsFixtures.indexOf(fixtureA);
-			var asteroid2 = asteroidsFixtures.indexOf(fixtureB);
-			if(asteroid1.fixtureDef.shape.GetRadius() >= 75){
-				explode(asteroid1);
-				destroyData.push({id: asteroids[asteroid1].id, explode: true});
-			} else {
-				destroyData.push({id: asteroids[asteroid1].id});
+		if(asteroidFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB) != -1)
+		{
+			var asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
+			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
+			{
+				explode(asteroid);
+				destroyData.push({id: asteroid.id, explode: true});
 			}
-			if(asteroid2.fixtureDef.shape.GetRadius() >= 75){
-				explode(asteroid2);
-				destroyData.push({id: asteroids[asteroid2].id, explode: true});
-			} else {
-				destroyData.push({id: asteroids[asteroid2].id}); 
+			else 
+			{
+				destroyData.push({id: asteroid.id});
 			}
-			destroyList.push(asteroids[asteroid1].body);
-			destroyList.push(asteroids[asteroid2].body);
-			asteroids.splice(asteroid1, 1);
-			asteroids.splice(asteroid2, 1);
-			asteroidsFixtures.splice(asteroid1, 1);
-			asteroidsFixtures.splice(asteroid2, 1);
+			destroyList.push(asteroid.body);
+			asteroids.splice(asteroid, 1);
+			asteroidFixtures.splice(fixtureA, 1);
+			
+			asteroid = asteroids[asteroidFixtures.indexOf(fixtureB)];
+			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
+			{
+				explode(asteroid);
+				destroyData.push({id: asteroid.id, explode: true});
+			} 
+			else 
+			{
+				destroyData.push({id: asteroid.id}); 
+			}
+			
+			destroyList.push(asteroid.body);
+			asteroids.splice(asteroid, 1);
+			asteroidFixtures.splice(fixtureB, 1);
+			
 			if(score == 0) score++;
 		}
 		//asteroid collides with planet
-		if((asteroidsFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
-		   (asteroidsFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) {
+		if((asteroidFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
+		   (asteroidFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) 
+		{
 			var asteroid; 
-			if(asteroidsFixtures.indexOf(fixtureA) != -1) {
-				asteroid = asteroidsFixtures.indexOf(fixtureA);
+			if(asteroidFixtures.indexOf(fixtureA) != -1) 
+			{
+				asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
 			}
-			else {
-				asteroid = asteroidsFixtures.indexOf(fixtureB);
+			else 
+			{
+				asteroid = asteroids[asteroidFixtures.indexOf(fixtureB)];
 			}
-			if(asteroid.fixtureDef.shape.GetRadius() >= 75) {
+			
+			if(asteroid.fixtureDef.shape.GetRadius() >= 75) 
+			{
 				explode(asteroid);
 			}
+			
 			score++;
-			destroyList.push(asteroids[asteroid].body);
-			destroyData.push({id: asteroids[asteroid].id});
+			destroyList.push(asteroid.body);
+			destroyData.push({id: asteroid.id});
 			asteroids.splice(asteroid, 1);
-			asteroidsFixtures.splice(asteroid, 1);
+			asteroidFixtures.splice(asteroid.fixtureDef, 1);
 		}
 		//asteroid collides with sun
-		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
-		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
+		if((asteroidFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
+		   (asteroidFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) 
+		{ 
 		   self.postMessage({gameStatus : 'gameover', score: score});
 		   clearInterval(interval);
 		   self.close();
@@ -184,14 +202,14 @@ function update()
 			destroyData.push({id: debrisFixtures[debrisFixtures.indexOf(fixtureB)].id});
 			debris.splice(debrisFixtures.indexOf(fixtureA), 1);
 			debris.splice(debrisFixtures.indexOf(fixtureB), 1);
-			asteroidsFixtures.splice(asteroid1, 1);
-			asteroidsFixtures.splice(debrisFixtures.indexOf(fixtureB), 1);
+			asteroidFixtures.splice(asteroid1, 1);
+			asteroidFixtures.splice(debrisFixtures.indexOf(fixtureB), 1);
 		}
 		//debris collides with asteroid, possibly implement destroying asteroids
 		if((debrisFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB)) != -1 ||
 		   (debrisFixtures.indexOf(fixtureB) != -1 && asteroidFixtures.indexOf(fixtureA)) != -1) {
 		   var debrisIndex;
-		   if(asteroidsFixtures.indexOf(fixtureA) == -1) {
+		   if(asteroidFixtures.indexOf(fixtureA) == -1) {
 				debrisIndex = debrisFixtures.indexOf(fixtureA);
 			}
 			else {
@@ -300,7 +318,7 @@ function generateAsteroids()
 		//add to world
 		var asteroid = new Asteroid();
 		asteroids.push(asteroid); //add to array
-		asteroidsFixtures.push(asteroid.fixtureDef);
+		asteroidFixtures.push(asteroid.fixtureDef);
 		asteroidId++;
 	 }
 	
