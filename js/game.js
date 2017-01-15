@@ -108,6 +108,7 @@ function game()
 {
 	this.fps = 60;
 	this.paused = false;
+	this.gameover = false;
 	
 	this.scaleWidth = this.scaleHeight = 1;
 	
@@ -165,13 +166,14 @@ game.prototype.tick = function(cnt)
 
 game.prototype.draw = function()
 {
-	//this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
+	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
 	
 	for(var i = 0; i < this.renderObjects.length; i++)
 	{
 		this.renderObjects[i].draw(this.ctx);
 	}
 	
+	console.log(this.renderObjects);
 }
 
 game.prototype.handleEvent = function(e)
@@ -201,6 +203,14 @@ game.prototype.handleEvent = function(e)
 		}
 		
 		gameSession.tick();
+	}
+	else if(e.data.gameStatus === 'update')
+	{
+		
+	}
+	else if(e.data.gameStatus === 'gameover')
+	{
+		this.gameover = true;
 	}
 	else
 	{
@@ -289,63 +299,4 @@ planet.prototype.draw = function(ctx)
 	ctx.stroke();
 	
 	this.arc -= Math.PI / (Math.pow(Math.log(this.radius), 4));
-}
-
-/*function stars(data)
-{
-	this.count = data.count;
-	this.starSystem = [];
-	for(var i = 0; i < this.count; i++)
-	{
-		this.starSystem.push({x : Math.random() * (gameSession.canvas.width - 20 + 1) + 20, y : Math.random() * (gameSession.canvas.height - 20 + 1) + 20});
-	}
-}
-
-stars.prototype.draw = function(ctx)
-{
-	ctx.beginPath();
-	ctx.rect(0, 0, gameSession.canvas.width, gameSession.canvas.height);
-	ctx.fillStyle = 'black';
-	ctx.fill();
-	var size = .1;
-	for(var i = 0; i < this.starSystem.length; i++)
-	{
-		ctx.beginPath();
-		ctx.rect(this.starSystem[i].x - size, this.starSystem[i].y - size, 2 * size, 2 * size);
-		ctx.lineWidth = 1.5;
-		ctx.strokeStyle = 'white';
-		ctx.stroke();
-	}
-}*/
-
-function writeText(options)
-{
-	var x = options.x;
-	var y = options.y;
-	var font = options.font;
-	var color = options.color;
-	var text = options.text;
-	var ctx = options.ctx;
-	
-	ctx.save();
-	
-	if('shadow' in options)
-	{
-		ctx.shadowColor = options.shadow.color;
-		ctx.shadowOffsetX = options.shadow.x;
-		ctx.shadowOffsetY = options.shadow.y;
-		ctx.shadowBlur = options.shadow.blur;
-	}
-	
-	ctx.font = font;
-	ctx.fillStyle = color;
-	
-	if('align' in options)
-	{
-		ctx.textAlign = options.align;
-	}
-	
-	ctx.fillText( text , x , y);
-	
-	ctx.restore();
 }

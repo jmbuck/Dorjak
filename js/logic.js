@@ -44,7 +44,7 @@ var thrust;
 var thrustCap = 2;
 var world;
 var fps;
-var sunRadius = 50;
+var sunRadius = 40;
 var orbitSize = 2;
 var sunObject;
 var listener = new b2ContactListener();
@@ -199,8 +199,8 @@ function initWorld()
 		var radius = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8;
 		orbitsData.push({sun : null, radius : radius, size : orbitSize});
 		
-		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, radius : planets[i * 2].fixtureDef.shape.GetRadius()});
-		planetsData.push({sun : null, radius : radius, arc : planets[i * 2 + 1].arc, radius : planets[i * 2 + 1].fixtureDef.shape.GetRadius()});
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, size : planets[i * 2].fixtureDef.shape.GetRadius()});
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2 + 1].arc, size : planets[i * 2 + 1].fixtureDef.shape.GetRadius()});
 	}
 	
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData, score: score});
@@ -308,7 +308,7 @@ function Planet(planetOrbit, angle)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random()*planetOrbit / 50 + .75) * (Math.pow(1.6, planetOrbit) + baseRadius)*(planetOrbit+4)/28);
+	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 4)*(planetOrbit + 1));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
