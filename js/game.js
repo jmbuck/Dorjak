@@ -18,7 +18,7 @@ WebFontConfig = {
 
 function start()
 {
-	gameSession = new game();
+	gameSession = new menu();
 	
 	$(window).resize(function(e) {
 		gameSession.resize();
@@ -33,6 +33,9 @@ function menu()
 	
 	this.scaleWidth = this.scaleHeight = 1;
 	this.timeElapsed = 0;
+	
+	this.width = 0;
+	this.height = 0;
 }
 
 menu.prototype.init = function()
@@ -61,27 +64,34 @@ menu.prototype.resize = function()
 
 menu.prototype.startInputHandlers = function()
 {
-	$(document).mousemove(gameSession.mouseMove);
-	$(document).click(gameSession.mouseClick);
+	$(window).mousemove(gameSession.mouseMove);
+	$(window).click(gameSession.mouseClick);
 }
 
 menu.prototype.mouseMove = function(e)
 {
-	
+	if(e.pageX < gameSession.width * .7 && e.pageX > gameSession.width * .3)
+	{
+		if(e.pageY < 300 + gameSession.height / 15 && e.pageY > 300 - gameSession.height / 10)
+		{
+			gameSession.timeElapsed++;
+			return;
+		}
+	}
+	gameSession.timeElapsed = 0;
 }
 
 menu.prototype.mouseClick = function(e)
 {
-	
+	if(gameSession.timeElapsed > 0)
+	{
+		gameSession.changeGui();
+	}
 }
 
 menu.prototype.changeGui = function()
 {
 	gameSession = new game();
-	
-	$(window).resize(function(event) {
-		gameSession.resize();
-	});
 	
 	gameSession.init();
 }
@@ -93,11 +103,24 @@ menu.prototype.tick = function()
 	this.ctx.fillStyle = 'white';
 	this.ctx.fill();
 	
+	this.ctx.lineWidth = 4;
+	
 	this.ctx.font = "96px game";
 	this.ctx.fillStyle = 'orange';
 	this.ctx.textAlign = 'center';
+	this.ctx.strokeStyle = 'black';
 	this.ctx.fillText("Dorjak", this.width / 2, 100);
 	this.ctx.strokeText("Dorjak", this.width / 2, 100);
+	
+	this.ctx.lineWidth = 2;
+	
+	this.ctx.fillStyle = 'white';
+	this.ctx.font = '48px game';
+	this.ctx.strokeText("Let's Start", this.width / 2, 300);
+	if(this.timeElapsed > 0)
+	{
+		this.ctx.strokeText("Let's Start", this.width / 2 + Math.random() * 3, 300 + Math.random() * 3);
+	}
 		
 	this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
 }
@@ -107,6 +130,9 @@ function game()
 	this.fps = 60;
 	this.paused = 0;
 	this.ticks = 0;
+	
+	this.width = 0;
+	this.height = 0;
 	
 	this.scaleWidth = this.scaleHeight = 1;
 	
@@ -302,7 +328,7 @@ game.prototype.startInputHandlers = function()
 
 game.prototype.keyPress = function(e)
 {
-	if(this.paused === 0)
+	if(gameSession.paused === 0)
 	{
 		if(e.key == 32)
 		{
@@ -312,36 +338,36 @@ game.prototype.keyPress = function(e)
 		}
 		else
 		{
-			this.fps = 60;
-			this.paused = 0;
-			this.ticks = 0;
+			gameSession.fps = 60;
+			gameSession.paused = 0;
+			gameSession.ticks = 0;
 
-			this.scaleWidth = this.scaleHeight = 1;
+			gameSession.scaleWidth = gameSession.scaleHeight = 1;
 
-			this.renderObjects = [];
-			this.queuedMessages = [];
+			gameSession.renderObjects = [];
+			gameSession.queuedMessages = [];
 	
-			this.timeElapsed = 0;
-			this.destroyObjects = [];
+			gameSession.timeElapsed = 0;
+			gameSession.destroyObjects = [];
 			
-			this.init();
+			gameSession.init();
 		}
 	}
-	else if(this.paused == 1)
+	else if(gameSession.paused == 1)
 	{
 		
 	}
 	else
 	{
-		this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});	
+		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});	
 	}
 	return false;
 }
 
 game.prototype.keyRelease = function(e)
 {
-	if(this.paused === 3)
-		this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
+	if(gameSession.paused === 3)
+		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
 	return false;
 }
 
