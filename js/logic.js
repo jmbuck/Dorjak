@@ -223,7 +223,6 @@ function initWorld()
 	worldAABB.upperBound.y = screenHeight;
 	
 	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
-	world.SetContactListener(listener);
 	
 	sunObject = new Sun();
 	
@@ -257,44 +256,49 @@ function initWorld()
 		var fixtureA = contact.GetFixtureA();
 		var fixtureB = contact.GetFixtureB();
 		//asteroid collides with asteroid
-		if(asteroidFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB) != -1)
+		if(fixtureA.GetBody().GetUserData() instanceof Asteroid && fixtureB.GetBody().GetUserData() instanceof Asteroid)
 		{
 			console.log("asteroid-asteroid!");
-			var asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
+			var asteroid = asteroids[asteroids.indexOf(fixtureA.GetBody().GetUserData())];
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
 			}
 			
 			destroyList.push(asteroid.body);
-			asteroids.splice(asteroid, 1);
-			asteroidFixtures.splice(fixtureA, 1);
+			asteroids.splice(asteroids.indexOf(fixtureA.GetBody().GetUserData()), 1);
+			//asteroidFixtures.splice(fixtureA, 1);
 			
-			asteroid = asteroids[asteroidFixtures.indexOf(fixtureB)];
+			asteroid = asteroids[asteroids.indexOf(fixtureB.GetBody().GetUserData() instanceof Asteroid)];
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
 			}
 			
 			destroyList.push(asteroid.body);
-			asteroids.splice(asteroid, 1);
-			asteroidFixtures.splice(fixtureB, 1);
+			asteroids.splice(asteroids.indexOf(fixtureB.GetBody().GetUserData()), 1);
+			//asteroidFixtures.splice(fixtureB, 1);
 			
 			if(score == 0) score++;
 		}
 		//asteroid collides with planet
-		if((asteroidFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
-		   (asteroidFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) 
+		if((fixtureA.GetBody().GetUserData() instanceof Asteroid && fixtureB.GetBody().GetUserData() instanceof Planet) ||
+		   (fixtureB.GetBody().GetUserData() instanceof Asteroid && fixtureA.GetBody().GetUserData() instanceof Planet)) 
 		{
 			console.log("asteroid-planet!");
 			var asteroid; 
-			if(asteroidFixtures.indexOf(fixtureA) != -1) 
+			var index;
+			if(fixtureA.GetBody().GetUserData() instanceof Asteroid) 
 			{
-				asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
+				asteroid = asteroids[asteroids.indexOf(fixtureA.GetBody().GetUserData())];
+				index = asteroids.indexOf(fixtureA.GetBody().GetUserData());
+				console.log("Index" + index);
 			}
 			else 
 			{
-				asteroid = asteroids[asteroidFixtures.indexOf(fixtureB)];
+				asteroid = asteroids[asteroids.indexOf(fixtureB.GetBody().GetUserData())];
+				index = asteroids.indexOf(fixtureB.GetBody().GetUserData());
+				console.log("Index" + index);
 			}
 			
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75) 
@@ -304,12 +308,12 @@ function initWorld()
 			
 			score++;
 			destroyList.push(asteroid.body);
-			asteroids.splice(asteroid, 1);
-			asteroidFixtures.splice(asteroid.fixtureDef, 1);
+			asteroids.splice(index, 1);
+			//asteroidFixtures.splice(asteroid.fixtureDef, 1);
 		}
 		//asteroid collides with sun
-		if((asteroidFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
-		   (asteroidFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) 
+		if((fixtureA.GetBody().GetUserData() instanceof Asteroid  && fixtureB.GetBody().GetUserData() instanceof Sun) ||
+		   (fixtureB.GetBody().GetUserData() instanceof Asteroid && fixtureA.GetBody().GetUserData() instanceof Sun)) 
 		{ 
 			console.log("asteroid-sun!");
 		   self.postMessage({gameStatus : 'gameover', score: score});
@@ -354,7 +358,7 @@ function initWorld()
 			debrisFixtures.splice(debrisIndex, 1);
 		}*/
 	}
-	
+	world.SetContactListener(listener);
 	interval = setInterval(update, 1000 / fps);
 }
 
@@ -510,6 +514,7 @@ function Sun()
 	this.bodyDef.type = b2Body.b2_staticBody;
 	this.bodyDef.position = new b2Vec2(screenWidth / 2, screenHeight / 2);
 	this.bodyDef.angle = 0;
+	this.bodyDef.userData = this;
 	
 	this.body = world.CreateBody(this.bodyDef);
 	
@@ -532,6 +537,7 @@ function Planet(planetOrbit, angle, id)
 	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));
 	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.angle = 0;
+	this.bodyDef.userData = this;
 	
 	this.body = world.CreateBody(this.bodyDef);
 	
@@ -550,6 +556,7 @@ function Asteroid() {
 	
 	this.bodyDef = new b2BodyDef; 
 	this.bodyDef.type = b2Body.b2_dynamicBody;
+	this.bodyDef.userData = this;
 	  
 	var side = getRandomInt(1, 4) //generate start position
 	switch(side) {
