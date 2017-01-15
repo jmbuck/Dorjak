@@ -386,7 +386,7 @@ function Planet(planetOrbit, angle, id)
 	this.arc = angle;
 	this.selected = 0;
 	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) + Math.pow(1.2, 5 * Math.min(planetOrbit, 5)));
-	this.baseAngularVelocity = (((10 - planetOrbit)) / 4 ) / this.distance;
+	this.baseAngularVelocity = (planetOrbit == 3 || planetOrbit == 4 ? -1 : 1) * (((10 - planetOrbit)) / 4 ) / this.distance;
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));

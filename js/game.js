@@ -307,6 +307,7 @@ game.prototype.handleEvent = function(e)
 		{
 			gameSession.renderObjects.push(new asteroid(e.data.asteroids[i]));
 		}
+		
 		var destroyObjects = [];
 		for(var i = 0; i < e.data.destroyed.length; i++)
 		{
