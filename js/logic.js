@@ -168,6 +168,8 @@ function update()
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
 		   self.postMessage({gameStatus : 'gameover', score: score});
+		   clearInterval();
+		   self.close();
 		}
 		//debris collides with debris
 		if(debrisFixtures.indexOf(fixtureA) != -1 && debrisFixtures.indexOf(fixtureB) != -1) {
@@ -287,8 +289,8 @@ function initWorld()
 	}
 	
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData, score: score});
-	
-	update();
+
+	setInterval(update, 1000 / fps);
 }
 
 function generateAsteroids()
