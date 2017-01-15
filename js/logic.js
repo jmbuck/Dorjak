@@ -178,13 +178,7 @@ function initWorld()
 		{
 			i+= 2;
 		}
-	}
-	
-	for(var i = 0; i < 8; i++)
-	{
-		
-	}
-	
+	}	
 	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : data});
 	ready = true;
 }
