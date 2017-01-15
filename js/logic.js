@@ -107,12 +107,13 @@ function update()
 
 function initWorld()
 {
-	//var gravity = new b2Vec2(0, 0);
 	var worldAABB = new b2AABB();
+	
 	worldAABB.lowerBound.x = 0;
 	worldAABB.lowerBound.y = 0;
 	worldAABB.upperBound.x = screenWidth
 	worldAABB.upperBound.y = screenHeight;
+	
 	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
 	
 	sunObject = new Sun();
@@ -137,13 +138,11 @@ function initWorld()
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData});
 }
 
-function generateAsteroids() {
+function generateAsteroids()
+{
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
-	 var minRadius = Math.floor(baseSize / 4);
-	 var maxRadius = baseRadius;
-	 var minVel = Math.floor(baseVel / 2);
-	 var maxVel = Math.ceil(baseVel * 2);
-	 for(var i = 0; i < numAsteroids; i++) {
+	 for(var i = 0; i < numAsteroids; i++) 
+	 {
 		//add to world
 		asteroids.push(new Asteroid()); //add to array
 	 }
