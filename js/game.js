@@ -231,7 +231,7 @@ game.prototype.tick = function(cnt)
 	
 	if(this.renderObjects.length > 0)
 	{
-		if(this.paused === 2)
+		if(this.paused === 0)
 		{
 			var sunObject = this.renderObjects[0];
 			
@@ -259,9 +259,6 @@ game.prototype.tick = function(cnt)
 				
 				this.ctx.lineWidth = 1;
 				this.ctx.fillStyle = this.ctx.strokeStyle = 'black';
-				for(var j = 0; j < 5; j++)
-				{
-					if(this.ticks - 60 - j * 2 > 0) {
 				for(var i = 0; i < 2 * Math.PI; i += Math.PI / 10)
 				{
 					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
@@ -271,13 +268,11 @@ game.prototype.tick = function(cnt)
 					this.ctx.lineTo(this.width / 2 + 35 * cos, this.height / 2 + sin * 35);
 					this.ctx.fill();
 					this.ctx.stroke();
-				}}
 				}
 				this.ctx.font = "48px game";
 				this.ctx.textAlign = 'center';
 				this.ctx.fillText(this.score, this.width / 2, this.height / 2 + 16);
 			}
-			this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 		}
 		else
 		{
@@ -406,9 +401,9 @@ game.prototype.startInputHandlers = function()
 
 game.prototype.keyPress = function(e)
 {
-	if(gameSession.paused === 0)
+	if(gameSession.paused === 2)
 	{
-		if(e.key == 32)
+		if(e.which == 32)
 		{
 			gameSession = new menu;
 			
@@ -430,9 +425,20 @@ game.prototype.keyPress = function(e)
 			gameSession.init();
 		}
 	}
-	else
+	else if ((gameSession instanceof game))
 	{
-		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});	
+		if(e.which == 27)
+		{
+			gameSession.logicHandler.terminate();
+			
+			gameSession = new menu;
+			
+			gameSession.init();
+		}
+		else
+		{
+			gameSession.logicHandler.postMessage({gameStatus : 'input', key : e.key, keyStatus : 1});	
+		}
 	}
 	return false;
 }
