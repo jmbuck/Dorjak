@@ -491,7 +491,7 @@ function Asteroid() {
 	
 }
 function collidePlanets(asteroid, planet) {
-	if(calculateDistance(asteroid, planet) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
+	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
 		destroyList.push(asteroid.body);
 		score++;
