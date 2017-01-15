@@ -341,13 +341,24 @@ function generateAsteroids()
 {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
 
-	 for(var i = 0; i < 1; i++) {
+	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
 		var asteroid = new Asteroid();
 		asteroids.push(asteroid); //add to array
 		asteroidId++;
 	 }
 	
+}
+
+function collideAsteroids(asteroidOne, asteroidsTwo)
+{
+	if(calculateDistance(asteroidOne, asteroidTwo) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwofixtureDef.shape.GetRadius());
+	{
+		destroyList.push(asteroidOne.body);
+		destroyList.push(asteroidTwo.body);
+		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
+		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
+	}
 }
 
 function calculateDistance(a, b) { //returns distance between object a and object b
@@ -514,4 +525,11 @@ function explode(asteroid) {
 		angle += (Math.PI/5);
 		debrisId++;
 	}	
+}function collidePlanets(asteroid, planet) {
+	if(calculateDistance(asteroid, planet) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
+		//colliding
+		destroyList.push(asteroid.body);
+		score++;
+		asteroids.splice(asteroids.indexOf(asteroid), 1);
+	}
 }
