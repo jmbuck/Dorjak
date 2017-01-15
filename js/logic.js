@@ -37,7 +37,7 @@ var baseRadius = 100;
 var baseDistance = 20;
 var screenWidth = 1920;
 var screenHeight = 1080;
-var baseVel = 1;
+var baseVel = 20;
 var currentOrbit = 0;
 var keys = [];
 var thrust;
@@ -329,7 +329,7 @@ function movePlanets(keyA, keyD)
 		{
 			if(keyD)
 			{
-				thrust += 0.2s
+				thrust += 0.2;
 				if(thrust < -thrustCap)
 					thrust = -thrustCap;
 			}
@@ -396,7 +396,7 @@ function Planet(planetOrbit, angle, id)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 4)*(planetOrbit + 1));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 4)*(planetOrbit + 4));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
@@ -406,7 +406,7 @@ function Asteroid() {
 	var minRadius = Math.floor(baseSize / 4);
 	var maxRadius = baseRadius;
 	var minVel = Math.floor(baseVel / 2);
-	var maxVel = Math.ceil(baseVel * 2);
+	var maxVel = Math.ceil(baseVel * 2.5);
 	
 	this.bodyDef = new b2BodyDef; 
 	this.bodyDef.type = b2Body.b2_dynamicBody;
