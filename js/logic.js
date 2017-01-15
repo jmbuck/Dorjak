@@ -397,7 +397,7 @@ function Planet(planetOrbit, angle, id)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 3)*(planetOrbit + 4));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() / 3 + 1 + planetOrbit / 3) * (planetOrbit / 2 + 1));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
@@ -482,18 +482,3 @@ function explode(asteroid) {
 		debrisId++;
 	}	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

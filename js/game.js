@@ -472,6 +472,6 @@ asteroid.prototype.draw = function(ctx)
 	ctx.beginPath();
 	ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 3, angle + Math.PI / 3);
 	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 4;
+	ctx.lineWidth = 2;
 	ctx.stroke();
 }
