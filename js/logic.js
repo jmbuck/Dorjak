@@ -467,9 +467,22 @@ function Asteroid() {
 	//generate velocity
 	this.bodyDef.angle = 0;
 	var angleToSun = calculateAngle(this, sunObject);
-	var velocity = getRandomInt(minVel, maxVel);
+	
+	var triangleHeight = this.bodyDef.position.y - sunObject.bodyDef.position.y;
+	var triangleBase = this.bodyDef.position.x - sunObject.bodyDef.position.x;
+	var ratio = triangleHeight/triangleBase;
+	var velocity = getRandomInt(2, 5);
 	this.bodyDef.baseVelocity = velocity;
-	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angleToSun), velocity*Math.sin(angleToSun));
+	if(triangleBase < 0) 
+		this.bodyDef.linearVelocity.x =  velocity;
+	else 
+		this.bodyDef.linearVelocity.x =  -velocity;
+	
+	if (triangleHeight < 0)
+		this.bodyDef.linearVelocity.y = Math.abs(ratio) * velocity;
+	else
+		this.bodyDef.linearVelocity.y = Math.abs(ratio) * -velocity;
+	
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
