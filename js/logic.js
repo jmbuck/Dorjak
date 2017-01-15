@@ -196,19 +196,19 @@ function update()
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
-		for(var j = 0; j < planets.length; j++) {
+		/*for(var j = 0; j < planets.length; j++) {
 			var dist = calculateDistance(asteroids[i].bodyDef, planets[j].bodyDef); 
-			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
+			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 20) {
 				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
 				var yDiff = asteroids[i].bodyDef.position.y - planets[j].bodyDef.position.y;
 				//y
-				if(yDiff < 0) asteroids[i].bodyDef.linearVelocity.y += 2;
-				else asteroids[i].bodyDef.linearVelocity.y -= 2;
+				if(yDiff < 0) asteroids[i].bodyDef.linearVelocity.y += 4;
+				else asteroids[i].bodyDef.linearVelocity.y -= 4;
 				//x
-				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 2;
-				else asteroids[i].bodyDef.linearVelocity.x -= 2;
+				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 4;
+				else asteroids[i].bodyDef.linearVelocity.x -= 4;
 			}
-		}
+		}*/
 		var x = asteroids[i].bodyDef.position.x;
 		var y = asteroids[i].bodyDef.position.y;
 		asteroids[i].bodyDef.position.x += asteroids[i].bodyDef.linearVelocity.x;
