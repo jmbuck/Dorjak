@@ -30,7 +30,8 @@ var sunBody;
 var planets = [];
 var asteroids = [];
 var asteroidSpawnRate = 1000 //in milliseconds
-var baseRadius = 50;
+var baseRadius = 100;
+var baseDistance = 10;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
@@ -128,7 +129,7 @@ function initWorld()
 	var planetsData = [];
 	for(var i = 0; i < 4; i++)
 	{
-		var radius = baseRadius * Math.pow(1.5, i);
+		var radius = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8;
 		orbitsData.push({sun : null, radius : radius, size : orbitSize});
 		
 		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, size : planets[i * 2].fixtureDef.shape.GetRadius()});
@@ -213,18 +214,19 @@ function Planet(planetOrbit, angle)
 {
 	this.arc = angle;
 	this.selected = 0;
+	this.distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
 	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
+	this.position = new b2Vec2(distance*cos(angle), distance*sin(angle));
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_kinematicBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.sin(angle))
+	this.bodyDef.position = new b2Vec2()
 	this.bodyDef.angle = 0;
-	this.distance = calculateDistance(this, sunObject);
 	
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() / 4 + .75) * (Math.pow(1.25, planetOrbit) + baseRadius));
+	this.fixtureDef.shape = new b2CircleShape((Math.random()*planetOrbit / 50 + .75) * (Math.pow(1.6, planetOrbit) + baseRadius)*(planetOrbit+4)/28);
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
