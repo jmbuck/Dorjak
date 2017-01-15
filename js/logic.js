@@ -186,6 +186,8 @@ function update()
 	
 	if(totalSteps == 60) 
 	{
+		
+	    console.log(asteroids);
 		generateAsteroids();
 		totalSteps = 0;
 	} 
@@ -336,6 +338,7 @@ function generateAsteroids()
 		//add to world
 		var asteroid = new Asteroid();
 		asteroids.push(asteroid); //add to array
+		console.log(asteroids);
 		asteroidId++;
 	 }
 	
@@ -371,6 +374,8 @@ function getRandomInt(min, max) {
 
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
+	var dist = calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef)
+	console.log(dist);
 	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
 		destroyList.push(asteroidOne);
