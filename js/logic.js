@@ -40,6 +40,7 @@ var thrust;
 var world;
 var fps;
 var sunRadius = 50;
+var sunObject;
 
 self.onmessage = function(e)
 {
@@ -117,13 +118,10 @@ function generateAsteroids() {
 		var asteroidBd = new b2BodyDef; 
 		asteroidBd.type = b2Body.b2_dynamicBody;
 	
-		//var body = world.CreateBody(bodyDef);
-	
 		asteroidFixt = new b2FixtureDef;
 		asteroidFixt.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius));
 		asteroidFixt.density = 1;
 	
-		this.body.CreateFixture(this.fixtureDef);
 		  
 		 var side = getRandomInt(1, 4) //generate start position
 		 switch(side) {
@@ -168,13 +166,14 @@ function generateAsteroids() {
 				}
 		 }
 		//generate velocity
-		var angle = calculateAngle(asteroidBd, sun); 
+		var asteroidBd.angle = calculateAngle(asteroidBd, sunObject); 
 		var velocity = getRandomInt(minVel, maxVel);
-		asteroidB.baseVelocity = velocity;
-		asteroidB.linearVelocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
+		asteroidBd.baseVelocity = velocity;
+		asteroidBd.linearVelocity.x = velocity*Math.cos(asteroidBd.angle);
+		asteroidBd.linearVeocity.y = velocity*Math.sin(asteroidBd.angle); 
 		
 		//add to world
-		asteroids.push(world.createBody(asteroidBd)); //add to array
+		asteroids.push(world.createBody(asteroidBd).createFixture(asteroidFixt); //add to array
 	 }
 	
 }
