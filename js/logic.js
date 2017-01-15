@@ -216,13 +216,12 @@ function update()
 		asteroids[i].bodyDef.position.y += asteroids[i].bodyDef.linearVelocity.y;
 		//remove asteroid if off screen (plus a little leeway, 15 in this case)
 		if(asteroids[i].bodyDef.position.x > screenWidth+15 || asteroids[i].bodyDef.position.x < -15 || asteroids[i].bodyDef.position.y > screenHeight+15 || asteroids[i].bodyDef.position.y < -15) {
-			destroyList.push(asteroids[i].body);
+			destroyList.push(asteroids[i]);
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
 			i--;
 			continue;
 		}
-		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}
 	
 	for(var i = 0; i < asteroids.length; i++)
@@ -277,11 +276,16 @@ function update()
 		destroyData.push({id : destroyList[i].id});
 	}
 	
+	for(var i = 0; i < asteroids.length; i++)
+	{
+		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
+	}
+	
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
 	for(var i = 0; i < destroyList.length; i++)
 	{
-		world.DestroyBody(destroyList[i]);
+		world.DestroyBody(destroyList[i].body);
 	}
 	destroyList = [];
 }
@@ -343,8 +347,8 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 {
 	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
-		destroyList.push(asteroidOne.body);
-		destroyList.push(asteroidTwo.body);
+		destroyList.push(asteroidOne);
+		destroyList.push(asteroidTwo);
 		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
 		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
 		return true;
@@ -371,7 +375,7 @@ function collideSun(asteroid)
 {
 	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
-		destroyList.push(asteroid.body);
+		destroyList.push(asteroid);
 		clearInterval(interval);
 		self.postMessage({gameStatus : 'gameover', score : score});
 		self.close();
@@ -487,7 +491,7 @@ function Asteroid() {
 function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
-		destroyList.push(asteroid.body);
+		destroyList.push(asteroid);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
 		return true;

@@ -230,8 +230,6 @@ game.prototype.resize = function()
 
 game.prototype.tick = function(cnt)
 {
-	if(this.queuedMessages.length > 0)
-		console.log("Deleting " + this.queuedMessages.length);
 	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
 		for(var j = 8; j < this.renderObjects.length; j++)
@@ -390,7 +388,7 @@ game.prototype.handleEvent = function(e)
 		
 		for(var i = 0; i < e.data.destroyed.length; i++)
 		{
-			gameSession.queuedMessages.push(e.data.destroyed[i]);
+			gameSession.queuedMessages.push(e.data.destroyed[i].id);
 		}
 	}
 	else
