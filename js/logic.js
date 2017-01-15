@@ -97,15 +97,11 @@ function initWorld()
 	
 	sunObject = new sun();
 	
-	var sunCircleDef = new b2CircleDef();
-	sunCircleDef.radius = baseRadius * 5;
-	
-	var sunB = new b2BodyDef();
-	sunB.addShape(sunCircleDef);
-	sunB.position.x = screenWidth / 2;
-	sunB.position.y = screenHeight / 2;
-	
-	sunBody = world.CreateBody(sunB);
+	for(var i = 0; i < 8; i += 2)
+	{
+		planets[i] = new planet(i, 0);
+		planets[i + 1] = new planet(i, Math.PI);
+	}
 	
 	for(var i = 1; i < 11; i++)
 	{
@@ -279,19 +275,32 @@ function getRandomInt(min, max) {
 
 function sun()
 {
-	this.bodyDef = new b2BodyDef();
+	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_staticBody;
 	this.bodyDef.position = new b2Vec2(screenWidth / 2, screenHeight / 2);
 	this.bodyDef.angle = 0;
 	
 	this.body = world.CreateBody(bodyDef);
 	
-	var circle = new b2CircleShape;
-	circle.radius = sunRadius;
+	this.fixtureDef = new b2FixtureDef;
+	this.fixtureDef.shape = new b2CircleShape(sunRadius);
+	this.fixtureDef.density = 1;
+	
+	this.body.CreateFixture(this.fixtureDef);
+}
+
+function planet(var planetOrbit, var angle)
+{
+	this.bodyDef = new b2BodyDef;
+	this.bodyDef.type = b2Body.b2_kinematicBody;
+	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.sin(angle))
+	this.bodyDef.angle - 0;
+	
+	this.body = world.CreateBody(bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	fixtureDef.shape = circle;
-	fixtureDef.density = 1;
+	this.fixtureDef.shape = new b2CircleShape((Math.random() / 2 + .75) * Math.pow(2, i));
+	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
 }
