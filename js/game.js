@@ -3,25 +3,84 @@ var gameSession = null;
 var widthToScale = 1920;
 var heightToScale = 1080;
 
-$j(function() { 
+$(function() { 
 	start();
 });
 
 function start()
 {
+	gameSession = new menu();
+	
+	gameSession.init();
+}
+
+function menu()
+{
+	this.fps = 60;
+	
+	this.scaleWidth = this.scaleHeight = 1;
+	this.timeElapsed = 0;
+}
+
+menu.prototype.init = function()
+{
+	this.ctx = $('#canvas')[0].getContext('2d');
+	this.canvas = this.ctx.canvas;
+	
+	this.resize();
+	
+	this.startInputHandlers();
+	
+	this.tick();
+}
+
+menu.prototype.resize = function()
+{
+	this.width = $(window).innerWidth();
+	this.height = $(window).innerHeight();
+	
+	this.canvas.width = this.width;
+	this.canvas.height = this.height;
+	
+	this.scaleWidth = this.width / widthToScale;
+	this.scaleHeight = this.height / heightToScale;
+}
+
+menu.prototype.startInputHandlers = function()
+{
+	$(document).mousemove(gameSession.mouseMove);
+	$(document).click(gameSession.mouseClick);
+}
+
+menu.prototype.mouseMove = function(e)
+{
+	console.log("hello");
+}
+
+menu.prototype.mouseClick = function(e)
+{
+	
+}
+
+menu.prototype.changeGui = function()
+{
 	gameSession = new game();
 	
-	$j(window).resize(function(event) {
+	$(window).resize(function(event) {
 		gameSession.resize();
 	});
 	
 	gameSession.init();
 }
 
+menu.prototype.tick = function()
+{
+	this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
+}
+
 function game()
 {
 	this.fps = 60;
-	this.on = true;
 	this.paused = false;
 	
 	this.scaleWidth = this.scaleHeight = 1;
@@ -35,10 +94,12 @@ function game()
 
 game.prototype.init = function()
 {
-	this.ctx = $j('#canvas')[0].getContext('2d');
+	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
 	
 	this.resize();
+	
+	this.startInputHandlers();
 	
 	this.logicHandler = new Worker("./js/logic.js");
 	
@@ -57,13 +118,13 @@ game.prototype.init = function()
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : Math.PI, size : 15}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : 0, size : 3}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : Math.PI, size : 5}));*/
-	//this.tick();
+	this.tick();
 }
 
 game.prototype.resize = function()
 {
-	this.width = $j(window).innerWidth();
-	this.height = $j(window).innerHeight();
+	this.width = $(window).innerWidth();
+	this.height = $(window).innerHeight();
 	
 	this.canvas.width = this.width;
 	this.canvas.height = this.height;
@@ -85,7 +146,6 @@ game.prototype.tick = function(cnt)
 			this.draw();
 		}
 	}
-	console.log(this.renderObjects);
 	//this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 }
 
@@ -97,6 +157,7 @@ game.prototype.draw = function()
 	{
 		this.renderObjects[i].draw(this.ctx);
 	}
+	
 }
 
 game.prototype.handleEvent = function(e)
@@ -133,10 +194,10 @@ game.prototype.handleEvent = function(e)
 	}
 }
 
-game.prototype.start_handling = function()
+game.prototype.startInputHandlers = function()
 {	
-	$j(document).on('keydown.game', gameSession.keyPress);
-	$j(document).on('keyup.game', gameSession.keyRelease);
+	$(document).on('keydown.game', gameSession.keyPress);
+	$(document).on('keyup.game', gameSession.keyRelease);
 }
 
 game.prototype.keyPress = function(e)

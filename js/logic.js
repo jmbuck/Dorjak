@@ -17,6 +17,7 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
 	, b2Joint = Box2D.Dynamics.Joints.b2Joint
 	, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef
 	, b2ContactListener = Box2D.Dynamics.b2ContactListener
+	, b2ContactListener = Box2D.Dynamics.b2ContactListener
 	, b2Settings = Box2D.Common.b2Settings
 	, b2Mat22 = Box2D.Common.Math.b2Mat22
 	, b2EdgeChainDef = Box2D.Collision.Shapes.b2EdgeChainDef
@@ -24,11 +25,13 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
 	, b2WorldManifold = Box2D.Collision.b2WorldManifold
 	;
 
-var d = new Date();
+var time = new Date();
 var startTime;
 var sunBody;
 var planets = [];
+var planetsFixtures = [];
 var asteroids = [];
+var asteroidsFixtures = [];
 var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 100;
 var baseDistance = 10;
@@ -44,13 +47,15 @@ var fps;
 var sunRadius = 50;
 var orbitSize = 2;
 var sunObject;
+var listener = new b2ContactListener();
+var destroyList = [];
 
 self.onmessage = function(e)
 {
 	if(e.data.gameStatus == "init") 
 	{
 		fps = e.data.fps;
-		startTime = d.getTime();
+		startTime = time.getTime();
 		initWorld();
 	} 
 	else if(e.data.gameStatus == "input")
@@ -97,31 +102,75 @@ function update()
 			keyS = 1;
 	}
 	
-	var currTime = d.getTime();
+	var currTime = time.getTime();
 	if(currTime - startTime > asteroidSpawnRate) 
 	{
 		startTime = currTime;
 		generateAsteroids();
 	}
+	
+	listener.BeginContact = function(contact) {
+		var fixtureA = contact.GetFixtureA();
+		var fixtureB = contact.GetFixtureB();
+		//asteroid collides with asteroid
+		if(asteroidsFixtures.indexOf(fixtureA) != -1 && asteroidsFixtures.indexOf(fixtureB) != -1)  {
+			var asteroid1 = asteroidsFixtures.indexOf(fixtureA);
+			var asteroid2 = asteroidsFixtures.indexOf(fixtureB);
+			destroyList.push(asteroids[asteroid1]);
+			destroyList.push(asteroids[asteroid2]);
+			asteroids.splice(asteroid1, 1);
+			asteroids.splice(asteroid2, 1);
+			asteroidsFixtures.splice(asteroid1, 1);
+			asteroidsFixtures.splice(asteroid1, 1);
+		}
+		//asteroid collides with planet
+		if((asteroidsFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
+		   (asteroidsFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) {
+			var asteroid; 
+			if(asteroidsFixtures.indexOf(fixtureA) != -1) {
+				asteroid = asteroidsFixtures.indexOf(fixtureA);
+			else 
+				asteroid = asteroidsFixtures.indexOf(fixtureB);
+			
+			destroyList.push(asteroids[asteroid]);
+			asteroids.splice(asteroid, 1);
+			asteroidsFixtures.splice(asteroid, 1);
+		}
+		//asteroid collides with sun
+		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
+		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
+			//GAME IS LOST   
+		}
+	}
+	
+	//destroy all objects to be destroyed
+	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
+	
 	timer = setTimeout( function() { update(); }  , 1000 / fps);
 }
 
 function initWorld()
 {
-	//var gravity = new b2Vec2(0, 0);
 	var worldAABB = new b2AABB();
+	
 	worldAABB.lowerBound.x = 0;
 	worldAABB.lowerBound.y = 0;
 	worldAABB.upperBound.x = screenWidth
 	worldAABB.upperBound.y = screenHeight;
+	
 	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
+	world.SetContactListener(listener);
 	
 	sunObject = new Sun();
 	
 	for(var i = 2; i < 10; i += 2)
 	{
-		planets.push(new Planet(i, 0));
-		planets.push(new Planet(i, Math.PI));
+		var planetObj = new Planet(i, 0);
+		var planetObj2 = new Planet(i, Math.PI);
+		planets.push(planetObj);
+		planets.push(planetObj2);
+		planetsFixtures.push(planetObj.fixtureDef);
+		planetsFixtures.push(planetObj2.fixtureDef);
 	}
 	
 	var sunData = {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()};
@@ -138,15 +187,15 @@ function initWorld()
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData});
 }
 
-function generateAsteroids() {
+function generateAsteroids()
+{
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
-	 var minRadius = Math.floor(baseSize / 4);
-	 var maxRadius = baseRadius;
-	 var minVel = Math.floor(baseVel / 2);
-	 var maxVel = Math.ceil(baseVel * 2);
+
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
-		asteroids.push(new Asteroid()); //add to array
+		var asteroid = new Asteroid();
+		asteroids.push(asteroid); //add to array
+		asteroidsFixtures.push(asteroid.fixtureDef);
 	 }
 	
 }
@@ -233,6 +282,11 @@ function Planet(planetOrbit, angle)
 }
 
 function Asteroid() {
+	var minRadius = Math.floor(baseSize / 4);
+	var maxRadius = baseRadius;
+	var minVel = Math.floor(baseVel / 2);
+	var maxVel = Math.ceil(baseVel * 2);
+	
 	this.bodyDef = new b2BodyDef; 
 	this.bodyDef.type = b2Body.b2_dynamicBody;
 	  
