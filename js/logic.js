@@ -338,7 +338,8 @@ function initWorld()
 function generateAsteroids()
 {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
-
+	 if(isMultiplayer) numAsteroids++;
+	 
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
 		asteroids.push(new Asteroid()); //add to array
@@ -446,10 +447,21 @@ function Planet(planetOrbit, angle, id)
 }
 
 function Asteroid() {
-	var minRadius = 6;
-	var maxRadius = 12;
-	var minVel = Math.floor(baseVel / 1.9);
-	var maxVel = Math.ceil(baseVel * 2);
+	var minRadius;
+	var maxRadius;
+	var minVel;
+	var maxVel;
+	if(isMultiplayer) {
+		minRadius = 7;
+		maxRadius = 13;
+		minVel = Math.floor(baseVel / 1.9);
+		maxVel = Math.ceil(baseVel*2.2);
+	} else {
+		minRadius = 6;
+		maxRadius = 12;
+		minVel = Math.floor(baseVel / 2);
+		maxVel = Math.ceil(baseVel * 2.1);
+	}
 	
 	this.bodyDef = new b2BodyDef; 
 	this.bodyDef.type = b2Body.b2_dynamicBody;
