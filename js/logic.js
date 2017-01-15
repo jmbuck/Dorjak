@@ -308,7 +308,7 @@ function initWorld()
 	
 	for(var i = 2; i < 9; i += 2)
 	{
-		var planetObj = new Planet(i, 0, i-1);
+		var planetObj = new Planet(i, 0, i - 1);
 		var planetObj2 = new Planet(i, Math.PI, i);
 		planets.push(planetObj);
 		planets.push(planetObj2);
@@ -358,8 +358,8 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 }
 
 function calculateDistance(a, b) { //returns distance between object a and object b
-	return Math.sqrt((a.bodyDef.position.x - b.bodyDef.position.x)*(a.bodyDef.position.x - b.bodyDef.position.x)+
-					  (a.bodyDef.position.y - b.bodyDef.position.y)*(a.bodyDef.position.y - b.bodyDef.position.y));
+	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
+					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
 }
 
 function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
@@ -374,7 +374,7 @@ function getRandomInt(min, max) {
 
 function collideSun(asteroid)
 {
-	if(calculateDistance(sunObject, asteroid) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
+	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
 		destroyList.push(asteroid.body);
 		clearInterval(interval);
