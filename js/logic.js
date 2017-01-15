@@ -154,11 +154,12 @@ function update()
 		}
 	}
 	
-	//asteroid capturing/slingshotting
+	//asteroid capturing/slingshotting; also creates asteroidData to send
+	var asteroidsData = [];
 	for(a in asteroids) {
 		for(p in planets) {
 			var dist = calculateDistance(a, p); 
-			if(dist - p.planet.fixtureDef.shape.GetRadius() <= 10) {
+			if(dist - p.fixtureDef.shape.GetRadius() <= 10) {
 				var xDiff = a.bodyDef.position.x - p.bodyDef.position.x;
 				var yDiff = a.bodyDef.position.y - p.bodyDef.position.y;
 				//y
@@ -169,13 +170,10 @@ function update()
 				else a.bodyDef.linearVelocity.x -= 3;
 			}
 		}
+		asteroidsData.push({sun : null, x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius(), id: asteroid.id});
 	}
 	
 	//sends gameStatus, asteroids, planets
-	var asteroidsData = [];
-	for(asteroid in asteroids) {
-		asteroidsData.push({sun : null, x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius(), id: asteroid.id});
-	}
 	var planetsData = [];
 	for(planet in planets) {
 		planetsData.push({arc : planet.arc, id: planet.id});
