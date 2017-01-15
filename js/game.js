@@ -120,7 +120,7 @@ menu.prototype.tick = function()
 {
 	this.ctx.beginPath();
 	this.ctx.rect(0, 0, this.width, this.height);
-	this.ctx.fillStyle = 'white';
+	this.ctx.fillStyle = 'black';
 	this.ctx.fill();
 	
 	this.ctx.lineWidth = 4;
@@ -128,7 +128,7 @@ menu.prototype.tick = function()
 	this.ctx.font = "96px game";
 	this.ctx.fillStyle = 'orange';
 	this.ctx.textAlign = 'center';
-	this.ctx.strokeStyle = 'black';
+	this.ctx.strokeStyle = 'white';
 	this.ctx.fillText("Dorjak", this.width / 2, 100);
 	this.ctx.strokeText("Dorjak", this.width / 2, 100);
 	
@@ -232,6 +232,8 @@ game.prototype.tick = function(cnt)
 {
 	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
+		if(this.queuedMessages[i].id > 10)
+		{
 		for(var j = 8; j < this.renderObjects.length; j++)
 		{
 			if(this.queuedMessages[i] == this.renderObjects[j].id)
@@ -239,6 +241,7 @@ game.prototype.tick = function(cnt)
 				this.renderObjects.splice(j, 1);
 				break;
 			}
+		}
 		}
 	}
 	this.queuedMessages = [];
@@ -258,7 +261,7 @@ game.prototype.tick = function(cnt)
 				this.ctx.arc(sunObject.x, sunObject.y, sunObject.radius, 0, 2 * Math.PI, false);
 				this.ctx.fillStyle = this.ticks % 10 < 5 ? 'red' : 'orange';
 				this.ctx.fill();
-				this.ctx.strokeStyle = 'black';
+				this.ctx.strokeStyle = 'white';
 				this.ctx.stroke();
 			}
 			else
@@ -266,13 +269,13 @@ game.prototype.tick = function(cnt)
 				this.ctx.lineWidth = 2;
 				this.ctx.beginPath();
 				this.ctx.arc(sunObject.x, sunObject.y, sunObject.radius, 0, 2 * Math.PI, false);
-				this.ctx.fillStyle = 'white';
+				this.ctx.fillStyle = 'black';
 				this.ctx.fill();
-				this.ctx.strokeStyle = 'white';
+				this.ctx.strokeStyle = 'black';
 				this.ctx.stroke();
 				
 				this.ctx.lineWidth = 1;
-				this.ctx.fillStyle = this.ctx.strokeStyle = 'black';
+				this.ctx.fillStyle = this.ctx.strokeStyle = 'white';
 				for(var i = 0; i < 2 * Math.PI; i += Math.PI / 10)
 				{
 					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
@@ -298,6 +301,11 @@ game.prototype.tick = function(cnt)
 game.prototype.draw = function()
 {
 	this.ctx.clearRect(0, 0, this.width, this.height);
+	
+	this.ctx.beginPath();
+	this.ctx.fillStyle = 'black';
+	this.ctx.rect(0, 0, this.width, this.height);
+	this.ctx.fill();
 	
 	for(var i = 0; i < this.renderObjects.length; i++)
 	{
@@ -502,7 +510,7 @@ sun.prototype.draw = function(ctx)
     ctx.arc(this.x + Math.random(), this.y + Math.random(), this.radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = 'orange';
     ctx.fill();
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = 'white';
     ctx.stroke();
 	
 	ctx.arc(this.x + Math.random() * 3, this.y + Math.random() * 3, this.radius, 0, 2 * Math.PI, false);
@@ -534,7 +542,7 @@ orbit.prototype.draw = function(ctx)
 	ctx.beginPath();
 	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
 	ctx.lineWidth = this.size;
-	ctx.strokeStyle = 'black';
+	ctx.strokeStyle = 'white';
 	ctx.stroke();
 }
 
@@ -551,9 +559,9 @@ planet.prototype.draw = function(ctx)
 {	
 	ctx.beginPath();
 	ctx.arc(this.sun.x + (this.sun.radius + this.radius) * Math.cos(this.arc), this.sun.y + (this.sun.radius + this.radius) * Math.sin(this.arc), this.size, 0, Math.PI * 2);
-	ctx.fillStyle = 'white';
+	ctx.fillStyle = 'black';
 	ctx.fill();
-	ctx.strokeStyle = 'black';
+	ctx.strokeStyle = 'white';
 	ctx.lineWidth = 1.5;
 	ctx.stroke();
 	
@@ -585,9 +593,12 @@ asteroid.prototype.draw = function(ctx)
 {
 	var angle = Math.atan2(this.x - this.sun.x, this.y - this.sun.y);
 	
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 6, angle + Math.PI / 6);
-	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 4;
-	ctx.stroke();
+	if(gameSession.paused != 2)
+	{
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 6, angle + Math.PI / 6);
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 4;
+		ctx.stroke();
+	}
 }
