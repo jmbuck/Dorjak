@@ -352,7 +352,7 @@ function generateAsteroids()
 
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
-	if(calculateDistance(asteroidOne, asteroidTwo) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroid.TwofixtureDef.shape.GetRadius());
+	if(calculateDistance(asteroidOne, asteroidTwo) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
 		destroyList.push(asteroidOne.body);
 		destroyList.push(asteroidTwo.body);
