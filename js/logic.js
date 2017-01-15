@@ -194,7 +194,8 @@ function update()
 		totalSteps++;
 	}
 	
-	for(var i = 0; i < asteroids.length; i++)
+	for(var i = 0; i < asteroids.length; i++){
+		
 		{
 				for(var j = 1; j < asteroids.length; j++)
 				{
@@ -292,6 +293,7 @@ function update()
 	}
 	destroyList = [];
 }
+
 
 function initWorld()
 {
