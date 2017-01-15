@@ -121,10 +121,10 @@ function update()
 		if(asteroidsFixtures.indexOf(fixtureA) != -1 && asteroidsFixtures.indexOf(fixtureB) != -1)  {
 			var asteroid1 = asteroidsFixtures.indexOf(fixtureA);
 			var asteroid2 = asteroidsFixtures.indexOf(fixtureB);
-			destroyList.push(asteroids[asteroid1].asteroid);
-			destroyList.push(asteroids[asteroid2].asteroid);
-			destroyData.push({asteroid: asteroids[asteroid1].asteroid, id: asteroids[asteroid1].id});
-			destroyData.push({asteroid: asteroids[asteroid2].asteroid, id: asteroids[asteroid2].id}); 
+			destroyList.push(asteroids[asteroid1]);
+			destroyList.push(asteroids[asteroid2]);
+			destroyData.push({id: asteroids[asteroid1].id});
+			destroyData.push({id: asteroids[asteroid2].id}); 
 			asteroids.splice(asteroid1, 1);
 			asteroids.splice(asteroid2, 1);
 			asteroidsFixtures.splice(asteroid1, 1);
@@ -142,8 +142,8 @@ function update()
 				asteroid = asteroidsFixtures.indexOf(fixtureB);
 			}
 			score++;
-			destroyList.push(asteroids[asteroid].asteroid);
-			destroyData.push({asteroid: asteroids[asteroid].asteroid, id: asteroids[asteroid].id});
+			destroyList.push(asteroids[asteroid]);
+			destroyData.push({id: asteroids[asteroid].id});
 			asteroids.splice(asteroid, 1);
 			asteroidsFixtures.splice(asteroid, 1);
 		}
@@ -159,14 +159,14 @@ function update()
 		for(p in planets) {
 			var dist = calculateDistance(a, p); 
 			if(dist - p.planet.fixtureDef.shape.GetRadius() <= 10) {
-				var xDiff = a.asteroid.bodyDef.position.x - p.planet.bodyDef.position.x;
-				var yDiff = a.asteroid.bodyDef.position.y - p.planet.bodyDef.position.y;
+				var xDiff = a.bodyDef.position.x - p.bodyDef.position.x;
+				var yDiff = a.bodyDef.position.y - p.bodyDef.position.y;
 				//y
-				if(aY < 0) a.asteroid.bodyDef.linearVelocity.y += 3;
-				else a.asteroid.bodyDef.linearVelocity.y -= 3;
+				if(aY < 0) a.bodyDef.linearVelocity.y += 3;
+				else a.bodyDef.linearVelocity.y -= 3;
 				//x
-				if(aX < 0) a.asteroid.bodyDef.linearVelocity.x += 3;
-				else a.asteroid.bodyDef.linearVelocity.x -= 3;
+				if(aX < 0) a.bodyDef.linearVelocity.x += 3;
+				else a.bodyDef.linearVelocity.x -= 3;
 			}
 		}
 	}
@@ -178,7 +178,7 @@ function update()
 	}
 	var planetsData = [];
 	for(planet in planets) {
-		planetsData.push({sun : null, radius : planet.distance, arc : planet.planet.arc, radius : planet.planet.fixtureDef.shape.GetRadius(), id: planet.id});
+		planetsData.push({arc : planet.arc, id: planet.id});
 	}
 	
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData});
@@ -206,10 +206,10 @@ function initWorld()
 	
 	for(var i = 2; i < 10; i += 2)
 	{
-		var planetObj = new Planet(i, 0);
-		var planetObj2 = new Planet(i, Math.PI);
-		planets.push({id: i - 1, planet: planetObj});
-		planets.push({id: i, planet: planetObj2});
+		var planetObj = new Planet(i, 0, i-1);
+		var planetObj2 = new Planet(i, Math.PI, i);
+		planets.push(planetObj);
+		planets.push(planetObj2);
 		planetsFixtures.push(planetObj.fixtureDef);
 		planetsFixtures.push(planetObj2.fixtureDef);
 	}
@@ -223,8 +223,8 @@ function initWorld()
 		var radius = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8;
 		orbitsData.push({sun : null, radius : radius, size : orbitSize, id: i+9});
 		
-		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].planet.arc, size : planets[i * 2].planet.fixtureDef.shape.GetRadius(), id: planets[i*2].id});
-		planetsData.push({sun : null, radius : radius, arc : planets[i * 2 + 1].planet.arc, size : planets[i * 2 + 1].planet.fixtureDef.shape.GetRadius(), id: planets[i*2+1].id});
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, size : planets[i * 2].fixtureDef.shape.GetRadius(), id: planets[i*2].id});
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2 + 1].arc, size : planets[i * 2 + 1].fixtureDef.shape.GetRadius(), id: planets[i*2+1].id});
 	}
 	
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData, score: score});
@@ -239,7 +239,7 @@ function generateAsteroids()
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
 		var asteroid = new Asteroid();
-		asteroids.push({id: asteroidId, asteroid: asteroid}); //add to array
+		asteroids.push(asteroid); //add to array
 		asteroidsFixtures.push(asteroid.fixtureDef);
 		asteroidId++;
 	 }
@@ -320,8 +320,9 @@ function Sun()
 	this.body.CreateFixture(this.fixtureDef);
 }
 
-function Planet(planetOrbit, angle)
+function Planet(planetOrbit, angle, id)
 {
+	this.id = id;
 	this.arc = angle;
 	this.selected = 0;
 	var distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
@@ -383,7 +384,7 @@ function Asteroid() {
 	var velocity = getRandomInt(minVel, maxVel);
 	this.bodyDef.baseVelocity = velocity;
 	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angleToSun), velocity*Math.sin(angleToSun));
-	
+	this.id = asteroidId;
 	this.body = world.createBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
 	
