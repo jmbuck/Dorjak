@@ -198,6 +198,8 @@ function game()
 game.prototype.init = function()
 {
 	this.score = 0;
+	this.player1 = 0;
+	this.player2 = 1;
 	
 	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
@@ -327,6 +329,8 @@ game.prototype.handleEvent = function(e)
 			planetData.radius *= gameSession.scaleWidth;
 			gameSession.renderObjects.push(new planet(planetData));
 		}
+		gameSession.player1 = 0;
+		gameSession.player2 = 1;
 	}
 	else if(e.data.gameStatus == 'update')
 	{
@@ -351,10 +355,21 @@ game.prototype.handleEvent = function(e)
 				}
 			}
 		}
-		gameSession.renderObjects[e.data.orbitOne + 1].color = 'rgba(0, 153, 153, 127)';
+		if(gameSession.player1 != e.data.orbitOne)
+		{
+			gameSession.renderObjects[gameSession.player1 + 1].color = null;
+			gameSession.renderObjects[e.data.orbitOne + 1].color = 'rgba(0, 153, 153, 127)';
+			gameSession.player1 = e.data.orbitOne;
+		}
+
 		if(isMultiplayer)
 		{
-			gameSession.renderObjects[e.data.orbitTwo + 1].color = 'rgba(153, 153, 0, 127)';
+			if(gameSession.player2 != e.data.orbitTwo)
+			{
+				gameSession.renderObjects[gameSession.player2 + 1].color = null;
+				gameSession.renderObjects[e.data.orbitTwo + 1].color = 'rgba(153, 153, 0, 127)';
+				gameSession.player2 = e.data.orbitTwo;
+			}
 		}
 		for(var i = 0; i < e.data.asteroids.length; i++)
 		{
