@@ -50,6 +50,7 @@ var sunObject;
 var listener = new b2ContactListener();
 var destroyList = [];
 var score;
+var asteroidId = 13;
 
 self.onmessage = function(e)
 {
@@ -128,6 +129,7 @@ function update()
 			asteroids.splice(asteroid2, 1);
 			asteroidsFixtures.splice(asteroid1, 1);
 			asteroidsFixtures.splice(asteroid1, 1);
+			if(score == 0) score++;
 		}
 		//asteroid collides with planet
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
@@ -148,7 +150,17 @@ function update()
 		//asteroid collides with sun
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
-		   self.postMessage({gameStatus : 'gameover'});
+		   self.postMessage({gameStatus : 'gameover', score: score});
+		}
+	}
+	
+	//asteroid capturing/slingshotting
+	for(a in asteroids) {
+		for(p in planets) {
+			var dist = calculateDistance(a, p); 
+			if(dist - p.planet.fixtureDef.shape.GetRadius() <= 10) {
+				
+			}
 		}
 	}
 	
@@ -162,7 +174,7 @@ function update()
 		planetsData.push({sun : null, radius : radius, arc : planet.planet.arc, radius : planet.planet.fixtureDef.shape.GetRadius(), id: planet.id});
 	}
 	
-	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, score: score});
+	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData});
 	while(destroyList.length > 0) {
 		world.DestroyBody(destroyList.pop());
 		destroyData.pop();
@@ -218,8 +230,9 @@ function generateAsteroids()
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
 		var asteroid = new Asteroid();
-		asteroids.push({id: i+13, asteroid: asteroid}); //add to array
+		asteroids.push({id: asteroidId, asteroid: asteroid}); //add to array
 		asteroidsFixtures.push(asteroid.fixtureDef);
+		asteroidId++;
 	 }
 	
 }
