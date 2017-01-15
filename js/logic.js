@@ -144,7 +144,7 @@ function update()
 		//asteroid collides with sun
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
-		   self.postMessage((gameStatus: 'gameover'});
+		   self.postMessage({gameStatus : 'gameover'});
 		}
 	}
 	
@@ -155,7 +155,7 @@ function update()
 	//sends gameStatus, asteroids, planets
 	var asteroidsData = [];
 	for(asteroid in asteroids) {
-		asteroidsData.push({x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius());
+		asteroidsData.push({x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius()});
 	}
 	var planetsData = [];
 	for(planet in planets) {
@@ -297,7 +297,7 @@ function Planet(planetOrbit, angle)
 {
 	this.arc = angle;
 	this.selected = 0;
-	this.distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
+	var distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
 	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
 	
 	this.bodyDef = new b2BodyDef;
