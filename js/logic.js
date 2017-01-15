@@ -144,9 +144,8 @@ function generateAsteroids() {
 	 var minVel = Math.floor(baseVel / 2);
 	 var maxVel = Math.ceil(baseVel * 2);
 	 for(var i = 0; i < numAsteroids; i++) {
-		
 		//add to world
-		asteroids.push(world.createBody(asteroidBd).createFixture(asteroidFixt); //add to array
+		asteroids.push(new Asteroid()); //add to array
 	 }
 	
 }
@@ -184,9 +183,9 @@ function calculateDistance(a, b) { //returns distance between object a and objec
 					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
 }
 
-function calculateAngle(current, target) { //returns angle to sun in radians
-	var triangleHeight = current.position.y - target.bodyDef.position.y;
-	var triangleBase = current.position.x - target.bodyDef.position.x;
+function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
+	var triangleHeight = current.bodyDef.position.y - target.bodyDef.position.y;
+	var triangleBase = current.bodyDef.position.x - target.bodyDef.position.x;
 	return Math.atan(triangleBase/triangleHeight);
 }
 
@@ -259,15 +258,15 @@ function Asteroid() {
 	}
 		 
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius));
+	this.fixtureDef.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius)); //random Radius
 	this.fixtureDef.density = 1;
 	
 	//generate velocity
-	this.bodyDef.angle = calculateAngle(this, sunObject); 
+	this.bodyDef.angle = 0;
+	var angleToSun = calculateAngle(this, sunObject);
 	var velocity = getRandomInt(minVel, maxVel);
 	this.bodyDef.baseVelocity = velocity;
-	this.bodyDef.linearVelocity.x = velocity*Math.cos(this.bodyDef.angle);
-	this.bodyDef.linearVeocity.y = velocity*Math.sin(this.bodyDef.angle); 
+	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angleToSun), velocity*Math.sin(angleToSun));
 	
 	this.body = world.createBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
