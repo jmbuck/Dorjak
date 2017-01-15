@@ -133,17 +133,20 @@ function generateAsteroids() {
 
 function initWorld()
 {
-	var gravity = new b2Vec2(0, 0);
+	//var gravity = new b2Vec2(0, 0);
 	var worldAABB = new b2AABB();
-	worldAABB.minVertex.Set(0,0); //wtf is this
-	worldAABB.maxVertex.Set(screenWidth, screenHeight);
+	worldAABB.minVertex.x = 0;
+	worldAABB.minVertex.y = 0;
+	worldAABB.maxVertex.x = screenWidth
+	worldAABB.maxVertex.y = screenHeight;
 	world = new b2World(worldAABB, gravity, true);
 	
 	var sunCircleDef = new b2CircleDef();
 	sunCircleDef.radius = baseRad*5;
 	var sunB = new b2BodyDef();
 	sunB.addShape(sunCircleDef);
-	sunB.position.Set(screenWidth/2, screenHeight/2);
+	sunB.position.x = screenWidth/2;
+	sunB.position.y = screenHeight/2;
 	sunBody = world.CreateBody(sunB);
 	
 	for(var i = 1; i < 11; i++)
@@ -171,23 +174,27 @@ function initWorld()
 		info.rad = planetBody.radius;
 		var planetB = new b2BodyDef();
 		planetB.addShape(planetCircleDef);
-		planetB.position.Set(screenWidth/2, screenHeight*i/11);
+		planetB.position.x = screenWidth/2;
+		planetB.position.y = screenHeight*i/11;
 		planetB.distanceFromSun = Math.abs(planetB.position.y - sun.position.y);
 		switch(i) {
 			case 1:
 				planetB.angleFromSun = Math.PI/2;			
 				planetB.baseVelocity = baseVel/2;
-				planetB.linearVelocity.Set(baseVel/2, 0);
+				planetB.linearVelocity.x = baseVel/2;
+				planetB.linearVelocity.y = 0;
 			break;
 			case 2:
 				planetB.angleFromSun = Math.PI/2;
 				planetB.baseVelocity = baseVel/1.7;
-				planetB.linearVelocity.Set(baseVel/1.7, 0);
+				planetB.linearVelocity.x = baseVel/1.7;
+				planetB.linearVelocity.y = 0;
 			break;
 			case 3:
 				planetB.angleFromSun = Math.PI/2;
 				planetB.baseVelocity = -baseVel/1.4;
-				planetB.linearVelocity.Set(-baseVel/1.4, 0);
+				planetB.linearVelocity.x = -baseVel/1.4;
+				planetB.linearVelocity.y = 0;
 			break;
 			case 4:
 				planetB.angleFromSun = Math.PI/2;
