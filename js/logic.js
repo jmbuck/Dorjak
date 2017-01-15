@@ -37,7 +37,7 @@ var baseRadius = 100;
 var baseDistance = 20;
 var screenWidth = 1920;
 var screenHeight = 1080;
-var baseVel = 20;
+var baseVel = 4;
 var currentOrbit = 0;
 var keys = [];
 var thrust;
@@ -133,7 +133,7 @@ function update()
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
-		/*for(var j = 0; j < planets.length; j++) {
+		for(var j = 0; j < planets.length; j++) {
 			var dist = calculateDistance(asteroids[i], planets[j]); 
 			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
 				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
@@ -145,7 +145,18 @@ function update()
 				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 3;
 				else asteroids[i].bodyDef.linearVelocity.x -= 3;
 			}
-		}*/
+		}
+		var x = asteroids[i].bodyDef.position.x
+		var y = asteroids[i].bodyDef.position.y
+		asteroids[i].bodyDef.position.x += asteroids[i].bodyDef.linearVelocity.x;
+		asteroids[i].bodyDef.position.y += asteroids[i].bodyDef.linearVelocity.y;
+		//remove asteroid if off screen (plus a little leeway, 15 in this case)
+		if(x > screenWidth+15 || x < -15 || y > screenHeight+15 || y < -15) {
+			destroyList.push(asteroids[i].body)
+			destroyData.push({id: asteroids[i].id});
+			asteroids.splice(i, 1);
+			asteroidsFixtures.splice(i, 1);
+		}
 		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}
 	
@@ -372,7 +383,7 @@ function calculateDistance(a, b) { //returns distance between object a and objec
 function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
 	var triangleHeight = current.bodyDef.position.y - target.bodyDef.position.y;
 	var triangleBase = current.bodyDef.position.x - target.bodyDef.position.x;
-	return Math.atan(triangleBase/triangleHeight);
+	return Math.atan2(triangleHeight, triangleBase);
 }
 
 function getRandomInt(min, max) {
@@ -421,7 +432,7 @@ function Asteroid() {
 	var minRadius = 5;
 	var maxRadius = 15
 	var minVel = Math.floor(baseVel / 2);
-	var maxVel = Math.ceil(baseVel * 2.5);
+	var maxVel = Math.ceil(baseVel * 2);
 	
 	this.bodyDef = new b2BodyDef; 
 	this.bodyDef.type = b2Body.b2_dynamicBody;
@@ -432,7 +443,7 @@ function Asteroid() {
 			 this.bodyDef.position = new b2Vec2(0, getRandomInt(0, screenHeight));
 			 break;
 		case 2: //right
-			 this.bodyDef.position = new b2Vec2(screenWidth, getRandomInt(0, screenHeight));
+			 this.bodyDef.position = new b2Vec2(screenWidth-100, getRandomInt(0, screenHeight));
 			 break;
 	    case 3: //top
 			 var rand = getRandomInt(1, 100);
