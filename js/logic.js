@@ -213,21 +213,19 @@ function Sun()
 function Planet(planetOrbit, angle)
 {
 	this.arc = angle;
-	
-	this.bodyDef = new b2BodyDef;
-	this.bodyDef.type = b2Body.b2_kinematicBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.sin(angle))
-	this.bodyDef.angle = angle;
-	this.bodyDef.radius = (planetOrbit*baseRadius)/4;
-	
-	this.body = world.CreateBody(this.bodyDef);
-	
 	this.selected = 0;
 	this.distance = calculateDistance(this, sun);
 	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
 	
+	this.bodyDef = new b2BodyDef;
+	this.bodyDef.type = b2Body.b2_kinematicBody;
+	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.sin(angle))
+	this.bodyDef.angle = 0;
+	
+	this.body = world.CreateBody(this.bodyDef);
+	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() / 2 + .75) * Math.pow(2, i));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() / 4 + .75) * (Math.pow(1.25, planetOrbit) + baseRadius));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
