@@ -51,6 +51,10 @@ var listener = new b2ContactListener();
 var destroyList = [];
 var score;
 var asteroidId = 13;
+var debris = [];
+var debrisFixtures = [];
+var debrisId = 1000;
+var debrisRadius = 5;
 
 self.onmessage = function(e)
 {
@@ -121,14 +125,24 @@ function update()
 		if(asteroidsFixtures.indexOf(fixtureA) != -1 && asteroidsFixtures.indexOf(fixtureB) != -1)  {
 			var asteroid1 = asteroidsFixtures.indexOf(fixtureA);
 			var asteroid2 = asteroidsFixtures.indexOf(fixtureB);
+			if(asteroid1.fixtureDef.shape.GetRadius() >= 75){
+				explode(asteroid1);
+				destroyData.push({id: asteroids[asteroid1].id, explode: true});
+			} else {
+				destroyData.push({id: asteroids[asteroid1].id});
+			}
+			if(asteroid2.fixtureDef.shape.GetRadius() >= 75){
+				explode(asteroid2);
+				destroyData.push({id: asteroids[asteroid2].id, explode: true});
+			} else {
+				destroyData.push({id: asteroids[asteroid2].id}); 
+			}
 			destroyList.push(asteroids[asteroid1]);
 			destroyList.push(asteroids[asteroid2]);
-			destroyData.push({id: asteroids[asteroid1].id});
-			destroyData.push({id: asteroids[asteroid2].id}); 
 			asteroids.splice(asteroid1, 1);
 			asteroids.splice(asteroid2, 1);
 			asteroidsFixtures.splice(asteroid1, 1);
-			asteroidsFixtures.splice(asteroid1, 1);
+			asteroidsFixtures.splice(asteroid2, 1);
 			if(score == 0) score++;
 		}
 		//asteroid collides with planet
@@ -141,6 +155,9 @@ function update()
 			else {
 				asteroid = asteroidsFixtures.indexOf(fixtureB);
 			}
+			if(asteroid.fixtureDef.shape.GetRadius() >= 75) {
+				explode(asteroid);
+			}
 			score++;
 			destroyList.push(asteroids[asteroid]);
 			destroyData.push({id: asteroids[asteroid].id});
@@ -151,6 +168,43 @@ function update()
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
 		   self.postMessage({gameStatus : 'gameover', score: score});
+		}
+		//debris collides with debris
+		if(debrisFixtures.indexOf(fixtureA) != -1 && debrisFixtures.indexOf(fixtureB) != -1) {
+			destroyList.push(debrisFixtures[debrisFixtures.indexOf(fixtureA)]);
+			destroyList.push(debrisFixtures[debrisFixtures.indexOf(fixtureB)]);
+			destroyData.push({id: debrisFixtures[debrisFixtures.indexOf(fixtureA)].id});
+			destroyData.push({id: debrisFixtures[debrisFixtures.indexOf(fixtureB)].id});
+			debris.splice(debrisFixtures.indexOf(fixtureA), 1);
+			debris.splice(debrisFixtures.indexOf(fixtureB), 1);
+			asteroidsFixtures.splice(asteroid1, 1);
+			asteroidsFixtures.splice(debrisFixtures.indexOf(fixtureB), 1);
+		}
+		//debris collides with asteroid, possibly implement destroying asteroids
+		if((debrisFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB)) != -1 ||
+		   (debrisFixtures.indexOf(fixtureB) != -1 && asteroidFixtures.indexOf(fixtureA)) != -1) {
+		   var debrisIndex;
+		   if(asteroidsFixtures.indexOf(fixtureA) == -1) {
+				debrisIndex = debrisFixtures.indexOf(fixtureA);
+			}
+			else {
+				debrisIndex = debrisFixtures.indexOf(fixtureB);
+			}
+			destroyList.push(debrisFixtures[debrisIndex]);
+			destroyData.push({id: debrisFixtures[debrisIndex]});
+			debris.splice(debrisIndex, 1);
+			debrisFixtures.splice(debrisIndex, 1);
+		}
+		//debris collides with planet or sun 
+		if(debrisFixtures.indexOf(fixtureA) != -1 && (planetsFixtures.indexOf(fixtureB) != -1 || sunObject.fixtureDef == fixtureB) ||
+			debrisFixtures.indexOf(fixtureB) != -1 && (planetsFixtures.indexOf(fixtureA) != -1 || sunObject.fixtureDef == fixtureA) {
+			var debrisIndex;
+			if(debrisFixtures.indexOf(fixtureA) != -1) debrisIndex = debrisFixtures.indexOf(fixtureA);
+			else debrisIndex = debrisFixtures.indexOf(fixtureA);
+			destroyList.push(debrisFixtures[debrisIndex]);
+			destroyData.push({id: debrisFixtures[debrisIndex]});
+			debris.splice(debrisIndex, 1);
+			debrisFixtures.splice(debrisIndex, 1);
 		}
 	}
 	
@@ -170,7 +224,7 @@ function update()
 				else a.bodyDef.linearVelocity.x -= 3;
 			}
 		}
-		asteroidsData.push({sun : null, x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius(), id: asteroid.id});
+		asteroidsData.push({sun : null, x: a.bodyDef.position.x, y: a.bodyDef.position.y, radius: a.fixtureDef.shape.GetRadius(), id: a.id});
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -179,7 +233,12 @@ function update()
 		planetsData.push({arc : planet.arc, id: planet.id});
 	}
 	
-	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData});
+	var debrisData = [];
+	for(d in debris) {
+		debrisData.push{x: d.bodyDef.position.x, y: d.bodyDef.position.y, radius: debrisRadius, id: d.id});
+	}
+	//destroyed items will have an "explode" flag set to true if they explode
+	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
 	while(destroyList.length > 0) {
 		world.DestroyBody(destroyList.pop());
 		destroyData.pop();
@@ -386,6 +445,38 @@ function Asteroid() {
 	this.body = world.createBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
 	
+}
+
+function Debris(x, y, angle) {
+	this.id = id;
+	
+	this.bodyDef = new b2BodyDef;
+	this.bodyDef.position = new b2Vec2(x, y);
+	this.bodyDef.type = b2Body.b2_dynamicBody;
+	
+	this.body = world.CreateBody(this.bodyDef);
+	
+	this.fixtureDef = new b2FixtureDef;
+	this.fixtureDef.shape = new b2CircleShape(debrisRadius);
+	this.fixtureDef.density = 1;
+	var velocity = Math.ceil(baseVel*1.75);
+	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angle), velocity*Math.sin(angle));
+	this.body.CreateFixture(this.fixtureDef);
+	
+	
+}
+
+function explode(asteroid) {
+	var x = asteroid.bodyDef.position.x;
+	var y = asteroid.bodyDef.position.y;
+	angle = Math.PI/5; 
+	for(int i = 0; i < 10; i++) {
+		var debrisObject = new Debris(x, y, angle);
+		debris.push(debrisObject);
+		debrisFixtures.push(debrisObject.fixtureDef);
+		angle += (Math.PI/5);
+		debrisId++;
+	}	
 }
 
 
