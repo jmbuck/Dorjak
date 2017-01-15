@@ -213,21 +213,21 @@ function update()
 	
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
-	for(a in asteroids) {
-		for(p in planets) {
-			var dist = calculateDistance(a, p); 
-			if(dist - p.fixtureDef.shape.GetRadius() <= 10) {
-				var xDiff = a.bodyDef.position.x - p.bodyDef.position.x;
-				var yDiff = a.bodyDef.position.y - p.bodyDef.position.y;
+	for(var i = 0; i < asteroids.length; i++) {
+		for(var j = 0; j < planets.length; j++) {
+			var dist = calculateDistance(asterois[i], planets[j]); 
+			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
+				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
+				var yDiff = asteroids[i].bodyDef.position.y - planets[j].bodyDef.position.y;
 				//y
-				if(aY < 0) a.bodyDef.linearVelocity.y += 3;
-				else a.bodyDef.linearVelocity.y -= 3;
+				if(aY < 0) asteroids[i].bodyDef.linearVelocity.y += 3;
+				else asteroids[i].bodyDef.linearVelocity.y -= 3;
 				//x
-				if(aX < 0) a.bodyDef.linearVelocity.x += 3;
-				else a.bodyDef.linearVelocity.x -= 3;
+				if(aX < 0) asteroids[i].bodyDef.linearVelocity.x += 3;
+				else asteroids[i].bodyDef.linearVelocity.x -= 3;
 			}
 		}
-		asteroidsData.push({sun : null, x: a.bodyDef.position.x, y: a.bodyDef.position.y, radius: a.fixtureDef.shape.GetRadius(), id: a.id});
+		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -239,8 +239,8 @@ function update()
 	console.log(planetsData[0]);
 	
 	var debrisData = [];
-	for(d in debris) {
-		debrisData.push({x: d.bodyDef.position.x, y: d.bodyDef.position.y, radius: debrisRadius, id: d.id});
+	for(var i = 0; i < debris.length; i++) {
+		debrisData.push({x: debris[i].bodyDef.position.x, y: debris[i].bodyDef.position.y, radius: debrisRadius, id: debris[i].id});
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
@@ -323,13 +323,13 @@ function selectOrbit(keyW, keyS)
 
 function movePlanets(keyA, keyD)
 {
-	for(var planet in planets)
+	for(var i = 0; i < planets.length; i++)
 	{
-		if(planet.selected && (keyA || keyD) && keyA != keyD)
+		if(planets[i].selected && (keyA || keyD) && keyA != keyD)
 		{
 			if(keyD)
 			{
-				thrust += 0.2;
+				thrust += 0.2s
 				if(thrust < -thrustCap)
 					thrust = -thrustCap;
 			}
@@ -344,8 +344,8 @@ function movePlanets(keyA, keyD)
 			thrust += 0.1;
 		else if(thrust > 0)
 			thrust -= 0.1;
-		var angularVelocity = (planet.baseAngularVelocity + thrust*10);
-		planet.angle = planet.angle + angularVelocity;	
+		var angularVelocity = (planets[i].baseAngularVelocity + thrust*10);
+		planets[i].angle = planets[i].angle + angularVelocity;	
 	}
 }
 
