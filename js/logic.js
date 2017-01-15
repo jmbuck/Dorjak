@@ -146,7 +146,8 @@ function update()
 	
 	for(var i = 0; i < destroyList.length; i++)
 	{
-		destroyData.push({id : destroyList[i].id, explode : destroyList[i].fixtureDef.shape.getRadius() >= 75});
+		console.log(destroyList[i]);
+		destroyData.push({id : destroyList[i].id});
 	}
 	
 	//asteroid capturing/slingshotting; also creates asteroidData to send
@@ -174,7 +175,7 @@ function update()
 			destroyList.push(asteroids[i].body)
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
-			asteroidsFixtures.splice(i, 1);
+			asteroidFixtures.splice(i, 1);
 		}
 		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}
@@ -241,6 +242,7 @@ function initWorld()
 		//asteroid collides with asteroid
 		if(asteroidFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB) != -1)
 		{
+			console.log("asteroid-asteroid!");
 			var asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
@@ -267,6 +269,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) 
 		{
+			console.log("asteroid-planet!");
 			var asteroid; 
 			if(asteroidFixtures.indexOf(fixtureA) != -1) 
 			{
@@ -291,6 +294,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) 
 		{ 
+			console.log("asteroid-sun!");
 		   self.postMessage({gameStatus : 'gameover', score: score});
 		   clearInterval(interval);
 		   self.close();
@@ -486,9 +490,22 @@ function Asteroid() {
 	//generate velocity
 	this.bodyDef.angle = 0;
 	var angleToSun = calculateAngle(this, sunObject);
-	var velocity = getRandomInt(minVel, maxVel);
+	
+	var triangleHeight = this.bodyDef.position.y - sunObject.bodyDef.position.y;
+	var triangleBase = this.bodyDef.position.x - sunObject.bodyDef.position.x;
+	var ratio = triangleHeight/triangleBase;
+	var velocity = getRandomInt(2, 5);
 	this.bodyDef.baseVelocity = velocity;
-	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angleToSun), velocity*Math.sin(angleToSun));
+	if(triangleBase < 0) 
+		this.bodyDef.linearVelocity.x =  velocity;
+	else 
+		this.bodyDef.linearVelocity.x =  -velocity;
+	
+	if (triangleHeight < 0)
+		this.bodyDef.linearVelocity.y = Math.abs(ratio) * velocity;
+	else
+		this.bodyDef.linearVelocity.y = Math.abs(ratio) * -velocity;
+	
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
