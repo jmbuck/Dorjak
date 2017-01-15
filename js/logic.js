@@ -37,7 +37,7 @@ var baseRadius = 100;
 var baseDistance = 20;
 var screenWidth = 1920;
 var screenHeight = 1080;
-var baseVel = 100;
+var baseVel = 1;
 var currentOrbit = 0;
 var keys = [];
 var thrust;
@@ -232,10 +232,11 @@ function update()
 	
 	//sends gameStatus, asteroids, planets
 	var planetsData = [];
-	for(planet in planets) {
-		planet.arc += planet.baseAngularVelocity;
-		planetsData.push({arc : planet.arc, id: planet.id});
+	for(var i = 0; i < planets.length; i++) {
+		planets[i].arc += planets[i].baseAngularVelocity;
+		planetsData.push({arc : planets[i].arc, id: planets[i].id});
 	}
+	console.log(planetsData[0]);
 	
 	var debrisData = [];
 	for(d in debris) {
@@ -272,7 +273,6 @@ function initWorld()
 		planetsFixtures.push(planetObj.fixtureDef);
 		planetsFixtures.push(planetObj2.fixtureDef);
 	}
-	console.log(planets[0]);
 	score = 0;
 	
 	var sunData = {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()};
@@ -386,7 +386,7 @@ function Planet(planetOrbit, angle, id)
 	this.arc = angle;
 	this.selected = 0;
 	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) + Math.pow(1.2, 5 * Math.min(planetOrbit, 5)));
-	this.baseAngularVelocity = (((10 - planetOrbit) * baseVel) / 4 ) / this.distance;
+	this.baseAngularVelocity = (((10 - planetOrbit)) / 4 ) / this.distance;
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));
