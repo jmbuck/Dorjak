@@ -172,7 +172,7 @@ function generateAsteroids() {
 					asteroidBd.position.y = 0;
 				}
 				else {
-					asteroidBd.position.x = (getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth));
+					asteroidBd.position.x = (getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)));
 					asteroidBd.position.y = 0;
 				}
 		 }
