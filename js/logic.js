@@ -31,7 +31,7 @@ var sunBody;
 var planets = [];
 var asteroids = [];
 var data = [];
-var asteroidSpawnRate = 2000 //in milliseconds
+var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
@@ -72,7 +72,7 @@ function generateAsteroids() {
 	 var minRadius = Math.floor(baseSize / 4);
 	 var maxRadius = baseRadius;
 	 var minVel = Math.floor(baseVel / 2);
-	 var maxVel = Math.floor(baseVel * 2);
+	 var maxVel = Math.ceil(baseVel * 2);
 	 for(var i = 0; i < numAsteroids; i++) {
 		 var asteroidDef = new b2CircleDef();
 		 asteroidDef.radius = getRandomInt(minRadius, maxRadius);
@@ -88,21 +88,23 @@ function generateAsteroids() {
 			 asteroidBd.position.Set(screenWidth, getRandomInt(0, screenHeight));
 			 break;
 			 case 3: //top, will only come from left and right 15% of top screen
-				 var rand = getRandomInt(0, 1);
-				 if(rand) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth)), screenHeight);
-				 else asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), screenHeight);
+				 var rand = getRandomInt(1, 100);
+				 if(rand <= 45) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth)), screenHeight);
+				 else if(rand <=90) asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), screenHeight);
+				 else asteroidBd.position.Set(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), screenHeight);
 			 break;
 			 case 4: //bottom, will only come from left and right 15% of bottom screen
 			 default:
-				var rand = getRandomInt(0, 1);
-				if(rand) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth), 0));
-				else asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
+				var rand = getRandomInt(1, 100);
+				if(rand <= 45) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth)), 0);
+				else if(rand <=90) asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
+				else asteroidBd.position.Set(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), 0);
 		 }
-		
-		var angle = calculateAngle(asteroid, sun); //generate velocity
+		//generate velocity
+		var angle = calculateAngle(asteroidBd, sun); 
 		var velocity = getRandomInt(minVel, maxVel);
-		asteroid.m_baseVelocity = velocity;
-		asteroid.m_velocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
+		asteroidB.baseVelocity = velocity;
+		asteroidB.linearVelocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
 		
 		//add to world
 		asteroids.push(world.createBody(asteroidBd)); //add to array
@@ -114,7 +116,7 @@ function initWorld()
 {
 	var gravity = new b2Vec2(0, 0);
 	var worldAABB = new b2AABB();
-	worldAABB.minVertex.Set(0,0);
+	worldAABB.minVertex.Set(0,0); //wtf is this
 	worldAABB.maxVertex.Set(screenWidth, screenHeight);
 	world = new b2World(worldAABB, gravity, true);
 	
