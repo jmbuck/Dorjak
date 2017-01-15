@@ -34,7 +34,7 @@ var asteroids = [];
 var asteroidsFixtures = [];
 var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 100;
-var baseDistance = 10;
+var baseDistance = 20;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
@@ -44,7 +44,7 @@ var thrust;
 var thrustCap = 2;
 var world;
 var fps;
-var sunRadius = 40;
+var sunRadius = 30;
 var orbitSize = 2;
 var sunObject;
 var listener = new b2ContactListener();
@@ -176,6 +176,7 @@ function update()
 	//sends gameStatus, asteroids, planets
 	var planetsData = [];
 	for(planet in planets) {
+		planet.arc += planet.baseAngularVelocity;
 		planetsData.push({arc : planet.arc, id: planet.id});
 	}
 	
@@ -211,6 +212,7 @@ function initWorld()
 		planetsFixtures.push(planetObj.fixtureDef);
 		planetsFixtures.push(planetObj2.fixtureDef);
 	}
+	console.log(planets[0]);
 	score = 0;
 	
 	var sunData = {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()};
@@ -218,7 +220,7 @@ function initWorld()
 	var planetsData = [];
 	for(var i = 0; i < 4; i++) //incorporate ID
 	{
-		var radius = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8;
+		var radius = planets[i * 2].distance;
 		orbitsData.push({sun : null, radius : radius, size : orbitSize, id: i+9});
 		
 		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, size : planets[i * 2].fixtureDef.shape.GetRadius(), id: planets[i*2].id});
@@ -323,11 +325,11 @@ function Planet(planetOrbit, angle, id)
 	this.id = id;
 	this.arc = angle;
 	this.selected = 0;
-	var distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
-	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
+	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) + Math.pow(1.2, 5 * Math.min(planetOrbit, 5)));
+	this.baseAngularVelocity = (((10 - planetOrbit) * baseVel) / 4 ) / this.distance;
 	
 	this.bodyDef = new b2BodyDef;
-	this.bodyDef.position = new b2Vec2(distance*Math.cos(angle), distance*Math.sin(angle));
+	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));
 	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.angle = 0;
 	

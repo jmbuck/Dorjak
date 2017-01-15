@@ -140,7 +140,6 @@ function game()
 	this.queuedMessages = [];
 	
 	this.timeElapsed = 0;
-	this.destroyObjects = [];
 }
 
 game.prototype.init = function()
@@ -176,44 +175,18 @@ game.prototype.resize = function()
 
 game.prototype.tick = function(cnt)
 {
-	for(var data in this.queuedMessages)
+	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
-		if(data.gameStatus === 'update')
+		for(var j = 0; j < this.renderObjects.length; j++)
 		{
-			console.log("this");
-			for(var object in this.renderObjects)
+			if(this.queuedMessages[i].id == this.renderObjects[j].id)
 			{
-				var found = false;
-				for(var i = 0; i < data.planets.length; i++)
-				{
-					if(data.planets[i].id == object.id)
-					{
-						if(object instanceof planet)
-						{
-							object.arc = data.arc;
-						}
-						else if(object instanceof asteroid)
-						{
-							object.x = data.x;
-							object.y = data.y;
-						}
-						found = true;
-						break;
-					}
-				}
-				if(!found)
-				{
-					data.sun = this.renderObjects[0];
-					this.renderObjects.push(new asteroid(data));
-				}
+				this.renderObjects.splice(j, 1);
+				break;
 			}
 		}
-		else if(e.data.gameStatus === 'gameover')
-		{
-			this.paused = 2;
-			this.score = data.score;
-		}
 	}
+	
 	if(this.renderObjects.length > 0)
 	{
 		if(this.paused === 2)
@@ -264,16 +237,11 @@ game.prototype.tick = function(cnt)
 			}
 			this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 		}
-		else if(this.paused === 1)
-		{
-			
-		}
 		else
 		{
 			this.draw();
 		}
 	}
-	//this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 }
 
 game.prototype.draw = function()
@@ -311,13 +279,47 @@ game.prototype.handleEvent = function(e)
 			planetData.radius *= gameSession.scaleWidth;
 			gameSession.renderObjects.push(new planet(planetData));
 		}
-		
-		gameSession.tick();
+	}
+	else if(e.data.gameStatus == 'update')
+	{
+		for(var i = 0; i < gameSession.renderObjects.length; i++)
+		{
+			for(var j = 0; j < e.data.planets.length; j++)
+			{
+				if(gameSession.renderObjects[i].id == e.data.planets[j].id)
+				{
+					gameSession.renderObjects[i].arc = e.data.planets[j].arc;
+					break;
+				}
+			}
+			for(var j = 0; j < e.data.asteroids.length; j++)
+			{
+				if(gameSession.renderObjects[i].id == e.data.asteroids[j].id)
+				{
+					gameSession.renderObjects[i].x = e.data.asteroids[j].x;
+					gameSession.renderObjects[i].y = e.data.asteroids[j].y;
+					e.data.asteroids.splice(j, 1);
+					break;
+				}
+			}
+		}
+		for(var i = 0; i < e.data.asteroids.length; i++)
+		{
+			gameSession.renderObjects.push(new asteroid(e.data.asteroids[i]));
+		}
+		var destroyObjects = [];
+		for(var i = 0; i < e.data.destroyed.length; i++)
+		{
+			destroyObjects.push(e.data.destroyed[i]);
+		}
+		gameSession.queuedMessages.push(destroyObjects);
 	}
 	else
 	{
-		gameSession.queuedMessages.push(e.data);
+		gameSession.paused = 2;
+		gameSession.score = e.data.score;
 	}
+	gameSession.tick();
 }
 
 game.prototype.startInputHandlers = function()
@@ -348,14 +350,9 @@ game.prototype.keyPress = function(e)
 			gameSession.queuedMessages = [];
 	
 			gameSession.timeElapsed = 0;
-			gameSession.destroyObjects = [];
 			
 			gameSession.init();
 		}
-	}
-	else if(gameSession.paused == 1)
-	{
-		
 	}
 	else
 	{
