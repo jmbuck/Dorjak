@@ -98,8 +98,20 @@ menu.prototype.mouseClick = function(e)
 {
 	if(gameSession.timeElapsed > 0)
 	{
-		gameSession = new game();
+		isMultiplayer = false;
+		gameSession = new game;
 	
+		$(window).unbind("mousemove");
+		$(window).unbind("click");
+		gameSession.init();
+	}
+	else if(gameSession.timeElapsed1 > 0)
+	{
+		isMultiplayer = true;
+		gameSession = new game;
+		
+		$(window).unbind("mousemove");
+		$(window).unbind("click");
 		gameSession.init();
 	}
 }
