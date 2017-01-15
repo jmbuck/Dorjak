@@ -78,7 +78,8 @@ function update()
 	world.Step(timeStep, 8, 3);
 	
 	var currTime = d.getTime();
-	if(currTime - startTime > asteroidSpawnRate) {	//asteroid generation
+	if(currTime - startTime > asteroidSpawnRate) 
+	{
 		startTime = currTime;
 		generateAsteroids();
 	}
@@ -102,7 +103,8 @@ function initWorld()
 		planets.push(new planet(i, 0));
 		planets.push(new planet(i, Math.PI));
 	}
-	postMessage({gameStatus : 'init', sun : {x : sun.bodyDef.position.x, y: sun.bodyDef.position.y , radius : sun.m_radius}, planets : data});
+	
+	postMessage({gameStatus : 'init', sun : {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()}, planets : data});
 }
 
 function generateAsteroids() {
