@@ -245,7 +245,6 @@ function update()
 			destroyList.push(asteroids[i].body)
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
-			asteroidFixtures.splice(i, 1);
 			i--;
 			continue;
 		}
@@ -531,4 +530,11 @@ function explode(asteroid) {
 		angle += (Math.PI/5);
 		debrisId++;
 	}	
+}function collidePlanets(asteroid, planet) {
+	if(calculateDistance(asteroid, planet) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
+		//colliding
+		destroyList.push(asteroid.body);
+		score++;
+		asteroids.splice(asteroids.indexOf(asteroid), 1);
+	}
 }
