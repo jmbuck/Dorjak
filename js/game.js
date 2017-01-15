@@ -198,7 +198,7 @@ game.prototype.init = function()
 	this.logicHandler = new Worker("./js/logic.js");
 	
 	this.logicHandler.addEventListener('message', this.handleEvent);
-	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps});
+	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps, multiplayer : isMultiplayer});
 	
 	this.tick();
 }

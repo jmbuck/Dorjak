@@ -40,6 +40,7 @@ var screenHeight = 1080;
 var baseVel = 4;
 var currentOrbit = 0;
 var keys = [];
+var isMultiplayer;
 var thrust;
 var thrustCap = 2;
 var world;
@@ -64,6 +65,7 @@ self.onmessage = function(e)
 	{
 		fps = e.data.fps;
 		startTime = time.getTime();
+		isMultiplayer = e.data.multiplayer;
 		initWorld();
 	} 
 	else if(e.data.gameStatus == "input")
@@ -102,11 +104,14 @@ function update()
 	var timeStep = 1000 / fps;
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
-	var keyPress;
 	var keyA = 0;
 	var keyD = 0;
 	var keyW = 0;
 	var keyS = 0;
+	var keyJ = 0;
+	var keyL = 0;
+	var keyI = 0;
+	var keyK = 0;
 	for(var i = 0; i < keys.length; i++)
 	{
 		if(keys[i] == 'a')
@@ -117,6 +122,20 @@ function update()
 			keyW = 1;
 		if(keys[i] == 's')
 			keyS = 1;
+	}
+	if(isMultiplayer)
+	{
+		for(var i = 0; i < keys.length; i++)
+		{
+			if(keys[i] == 'j')
+				keyJ = 1;
+			if(keys[i] == 'l')
+				keyL = 1;
+			if(keys[i] == 'i')
+				keyI = 1;
+			if(keys[i] == 'k')
+				keyK = 1;
+		}
 	}
 	
 	if(totalSteps == 60) 
@@ -233,6 +252,7 @@ function initWorld()
 		//asteroid collides with asteroid
 		if(asteroidFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB) != -1)
 		{
+			console.log("asteroid-asteroid!");
 			var asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
@@ -259,6 +279,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) 
 		{
+			console.log("asteroid-planet!");
 			var asteroid; 
 			if(asteroidFixtures.indexOf(fixtureA) != -1) 
 			{
@@ -283,6 +304,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) 
 		{ 
+			console.log("asteroid-sun!");
 		   self.postMessage({gameStatus : 'gameover', score: score});
 		   clearInterval(interval);
 		   self.close();
