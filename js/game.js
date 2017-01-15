@@ -331,7 +331,12 @@ game.prototype.handleEvent = function(e)
 			gameSession.renderObjects.push(new planet(planetData));
 		}
 		gameSession.player1 = 0;
-		gameSession.player2 = 1;
+		gameSession.renderObjects[gameSession.player1 + 1].color = 'rgba(0, 153, 153, 127)';
+		if(isMultiplayer)
+		{
+			gameSession.player2 = 1;
+			gameSession.renderObjects[gameSession.player2 + 1].color = 'rgba(153, 153, 0, 127)';
+		}
 	}
 	else if(e.data.gameStatus == 'update')
 	{
@@ -477,8 +482,8 @@ game.prototype.keyPress = function(e)
 
 game.prototype.keyRelease = function(e)
 {
-	if(gameSession.paused === 3)
-		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
+	if((gameSession instanceof game))
+		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e.key, keyStatus : 0});
 	return false;
 }
 
@@ -577,10 +582,12 @@ function asteroid(data)
 }
 
 asteroid.prototype.draw = function(ctx)
-{	
+{
+	var angle = Math.atan2(this.x - this.sun.x, this.y - this.sun.y);
+	
 	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+	ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 6, angle + Math.PI / 6);
 	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 2;
+	ctx.lineWidth = 4;
 	ctx.stroke();
 }
