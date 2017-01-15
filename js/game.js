@@ -48,7 +48,15 @@ game.prototype.init = function()
 	
 	//this.renderObjects.push(new stars({count : 200}));
 	this.renderObjects.push(new sun({x : this.ctx.canvas.width / 2, y : this.ctx.canvas.height / 2, radius : 50}));
+	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 60, size : 1}));
+	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 100, size : 1}));
+	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 160, size : 1}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : 0, size : 10}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 160, arc : 0, size : 8}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 160, arc : Math.PI, size : 12}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : Math.PI, size : 15}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : 0, size : 3}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : Math.PI, size : 5}));
 	this.tick();
 	
 	console.log('Finished Loading');
@@ -111,12 +119,21 @@ game.prototype.handleEvent = function(e)
 		
 		this.gameObjects.push(sunObject);
 		
+		for(var i = 0; i < e.data.orbits.length; i++)
+		{
+			var orbitData = e.data.orbits[i];
+			orbitData.sun = sunObject;
+			this.gameObjects.push(new orbit(orbitData));
+		}
+		
 		for(var i = 0; i < e.data.planets.length; i++)
 		{
 			var planetData = e.data.planets[i];
 			planetData.sun = sunObject;
 			this.gameObjects.push(new planet(planetData));
 		}
+		
+		this.tick();
 	}
 	else
 	{
@@ -160,6 +177,22 @@ sun.prototype.draw = function(ctx)
     ctx.stroke();
 }
 
+function orbit(data)
+{
+	this.sun = data.sun;
+	this.radius = data.radius;
+	this.size = data.arc;
+}
+
+orbit.prototype.draw = function(ctx)
+{
+	ctx.beginPath();
+	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
+	ctx.lineWidth = this.size;
+	ctx.strokeStyle = 'black';
+	ctx.stroke();
+}
+
 function planet(data)
 {
 	this.sun = data.sun;
@@ -169,20 +202,16 @@ function planet(data)
 }
 
 planet.prototype.draw = function(ctx)
-{
-	ctx.beginPath();
-	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = 'black';
-	ctx.stroke();
-	
+{	
 	ctx.beginPath();
 	ctx.arc(this.sun.x + (this.sun.radius + this.radius) * Math.cos(this.arc), this.sun.y + (this.sun.radius + this.radius) * Math.sin(this.arc), this.size, 0, Math.PI * 2);
 	ctx.fillStyle = 'white';
 	ctx.fill();
 	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 1;
+	ctx.lineWidth = 1.5;
 	ctx.stroke();
+	
+	this.arc -= Math.PI / (Math.pow(Math.log(this.radius), 4));
 }
 
 /*function stars(data)
