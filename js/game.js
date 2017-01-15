@@ -232,16 +232,16 @@ game.prototype.tick = function(cnt)
 {
 	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
-		if(this.queuedMessages[i].id > 10)
+		if(this.queuedMessages[i] > 10)
 		{
-		for(var j = 8; j < this.renderObjects.length; j++)
-		{
-			if(this.queuedMessages[i] == this.renderObjects[j].id)
+			for(var j = 8; j < this.renderObjects.length; j++)
 			{
-				this.renderObjects.splice(j, 1);
-				break;
+				if(this.queuedMessages[i] == this.renderObjects[j].id)
+				{
+					this.renderObjects.splice(j, 1);
+					break;
+				}
 			}
-		}
 		}
 	}
 	this.queuedMessages = [];
@@ -271,18 +271,18 @@ game.prototype.tick = function(cnt)
 				this.ctx.arc(sunObject.x, sunObject.y, sunObject.radius, 0, 2 * Math.PI, false);
 				this.ctx.fillStyle = 'black';
 				this.ctx.fill();
-				this.ctx.strokeStyle = 'black';
+				this.ctx.strokeStyle = 'white';
 				this.ctx.stroke();
 				
-				this.ctx.lineWidth = 1;
-				this.ctx.fillStyle = this.ctx.strokeStyle = 'white';
+				this.ctx.lineWidth = 4;
 				for(var i = 0; i < 2 * Math.PI; i += Math.PI / 10)
 				{
-					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
-					var sin = Math.sin(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
+					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j) * 2);
+					var sin = Math.sin(i) * (.5 - (this.ticks - 60 - j) * 2);
 					this.ctx.beginPath();
 					this.ctx.moveTo(this.width / 2 + 15 * cos, this.height / 2 + sin * 15);
 					this.ctx.lineTo(this.width / 2 + 35 * cos, this.height / 2 + sin * 35);
+					this.ctx.fillStyle = this.ctx.strokeStyle = 'white';
 					this.ctx.fill();
 					this.ctx.stroke();
 				}
@@ -346,7 +346,7 @@ game.prototype.handleEvent = function(e)
 			gameSession.renderObjects[gameSession.player2 + 1].color = 'rgba(153, 153, 0, 127)';
 		}
 	}
-	else if(e.data.gameStatus == 'update')
+	else if(e.data.gameStatus == 'update' && gameSession instanceof game)
 	{
 		for(var i = 0; i < gameSession.renderObjects.length; i++)
 		{
@@ -404,36 +404,6 @@ game.prototype.handleEvent = function(e)
 	{
 		gameSession.paused = 2;
 		gameSession.score = e.data.score;
-		if(isMultiplayer)
-		{
-			for(var i = 0; i < multiplayer.length; i++)
-			{
-				if(multiplayer[i] < e.data.score)
-				{
-					multiplayer.splice(i, 0, e.data.score);
-					break;
-				}
-			}
-			if(multiplayer.length > 15)
-			{
-				multiplayer.splice(15, 1);
-			}
-		}
-		else
-		{
-			for(var i = 0; i < multiplayer.length; i++)
-			{
-				if(singleplayer[i] < e.data.score)
-				{
-					singleplayer.splice(i, 0, e.data.score);
-					break;
-				}
-			}
-			if(singleplayer.length > 15)
-			{
-				singleplayer.splice(15, 1);
-			}
-		}
 	}
 	gameSession.tick();
 }
@@ -448,14 +418,18 @@ game.prototype.keyPress = function(e)
 {
 	if(gameSession.paused === 2)
 	{
-		if(e.which == 32)
+		if(e.which == 32 || e.which == 27)
 		{
+			gameSession.logicHandler.terminate();
+			
 			gameSession = new menu;
 			
 			gameSession.init();
 		}
 		else
 		{
+			gameSession.logicHandler.terminate();
+			
 			gameSession.fps = 60;
 			gameSession.paused = 0;
 			gameSession.ticks = 0;

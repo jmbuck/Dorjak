@@ -49,7 +49,7 @@ var orbitSize = 2;
 var sunObject;
 var destroyList = [];
 var score;
-var asteroidId = 13;
+var asteroidId = 20;
 var interval;
 var totalSteps = 0;
 var gameover = false;
