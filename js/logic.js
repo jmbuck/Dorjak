@@ -70,7 +70,7 @@ function generateAsteroids() {
 			 case 4: //bottom, will only come from left and right 15% of bottom screen
 			 default:
 				var rand = getRandomInt(0, 1);
-				if(rand) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth), 0);
+				if(rand) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth), 0));
 				else asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
 		 }
 		

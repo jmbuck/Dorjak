@@ -181,11 +181,18 @@ function orbit(data)
 {
 	this.sun = data.sun;
 	this.radius = data.radius;
-	this.size = data.arc;
+	this.size = data.size;
+	this.highlighed = true;
 }
 
 orbit.prototype.draw = function(ctx)
 {
+	ctx.beginPath();
+	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius - this.size / 5, 0, Math.PI * 2);
+	ctx.lineWidth = this.size * 10;
+	ctx.strokeStyle = 'rgba(0, 153, 153, 0.5)';
+	ctx.stroke();
+	
 	ctx.beginPath();
 	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
 	ctx.lineWidth = this.size;
