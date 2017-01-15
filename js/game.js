@@ -245,7 +245,7 @@ game.prototype.tick = function(cnt)
 	
 	if(this.renderObjects.length > 0)
 	{
-		if(this.paused === 0)
+		if(this.paused === 2)
 		{
 			var sunObject = this.renderObjects[0];
 			
@@ -577,10 +577,12 @@ function asteroid(data)
 }
 
 asteroid.prototype.draw = function(ctx)
-{	
+{
+	var angle = Math.atan2(this.x - this.sun.x, this.y - this.sun.y);
+	
 	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+	ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 6, angle + Math.PI / 6);
 	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 2;
+	ctx.lineWidth = 4;
 	ctx.stroke();
 }
