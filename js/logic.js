@@ -387,7 +387,6 @@ function getRandomInt(min, max) {
 
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
-	console.log(asteroidTwo.fixtureDef.shape.GetRadius());
 	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= (asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius()));
 	{
 		destroyList.push(asteroidOne);
