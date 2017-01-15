@@ -194,27 +194,6 @@ function update()
 		totalSteps++;
 	}
 	
-	for(var i = 0; i < asteroids.length; i++)
-		{
-				for(var j = 1; j < asteroids.length; j++)
-				{
-					collideAsteroids(asteroids[i], asteroids[j]);
-				}
-			for(var j = 0; j < planets.length; j++)
-			{
-				collidePlanets(asteroids[i], planets[j]);
-			}
-			collideSun(asteroids[i]);
-		}
-	}
-	
-	var destroyData = [];
-	
-	for(var i = 0; i < destroyList.length; i++)
-	{
-		destroyData.push({id : destroyList[i].id});
-	}
-	
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
@@ -238,10 +217,26 @@ function update()
 		//remove asteroid if off screen (plus a little leeway, 15 in this case)
 		if(asteroids[i].bodyDef.position.x > screenWidth+15 || asteroids[i].bodyDef.position.x < -15 || asteroids[i].bodyDef.position.y > screenHeight+15 || asteroids[i].bodyDef.position.y < -15) {
 			destroyList.push(asteroids[i]);
-			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
 			i--;
 			continue;
+		}
+	}
+	
+	for(var i = 0; i < asteroids.length; i++)
+	{
+			for(var j = 1; j < asteroids.length && i < asteroids.length; j++)
+			{
+				if(collideAsteroids(asteroids[i], asteroids[j]))
+					i = 0, j = 0;
+			}
+			for(var j = 0; j < planets.length && i < asteroids.length; j++)
+			{
+				if(ollidePlanets(asteroids[i], planets[j]))
+					i = 0, j = 0;
+			}
+			if(i < asteroids.length)
+			collideSun(asteroids[i]);
 		}
 	}
 	
@@ -265,7 +260,7 @@ function update()
 	
 	for(var i = 0; i < asteroids.length; i++)
 	{
-		for(var j = 0; j < planets.length; j++)
+		for(var j = 0; j < planets.length && i < asteroids.length; j++)
 		{
 			if(collidePlanets(asteroids[i], planets[j]))
 				i = 0, j = 0;
