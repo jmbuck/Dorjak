@@ -354,6 +354,8 @@ game.prototype.handleEvent = function(e)
 			{
 				if(gameSession.renderObjects[i].id == e.data.asteroids[j].id)
 				{
+					e.data.asteroids[j].x *= gameSession.scaleWidth;
+					e.data.asteroids[j].y *= gameSession.scaleHeight;
 					gameSession.renderObjects[i].x = e.data.asteroids[j].x;
 					gameSession.renderObjects[i].y = e.data.asteroids[j].y;
 					e.data.asteroids.splice(j, 1);

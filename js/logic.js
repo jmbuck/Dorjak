@@ -52,6 +52,7 @@ var score;
 var asteroidId = 13;
 var interval;
 var totalSteps = 0;
+var gameover = false;
 
 self.onmessage = function(e)
 {
@@ -62,7 +63,7 @@ self.onmessage = function(e)
 		isMultiplayer = e.data.multiplayer;
 		initWorld();
 	} 
-	else if(e.data.gameStatus == "input")
+	else if(e.data.gameStatus == "input" && !gameover)
 	{
 		if(e.data.keyStatus == 0)
 		{
@@ -187,7 +188,7 @@ function update()
 		generateAsteroids();
 		totalSteps = 0;
 	} 
-	else 
+	else if(!gameover)
 	{
 		totalSteps++;
 	}
@@ -376,8 +377,6 @@ function getRandomInt(min, max) {
 
 function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= (asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius())) {
-		//colliding
-		console.log("A-P");
 		destroyList.push(asteroid);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
@@ -390,9 +389,13 @@ function collideSun(asteroid)
 {
 	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
-		console.log("A-S");
 		destroyList.push(asteroid);
 		self.postMessage({gameStatus : 'gameover', score : score});
+		for(var i = 0; i < asteroids.length; i++)
+		{
+			destroyList.push(asteroids[i]);
+		}
+		gameover = true;
 		return true;
 	}
 	return false;
