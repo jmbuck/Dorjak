@@ -299,11 +299,10 @@ function Planet(planetOrbit, angle)
 	this.selected = 0;
 	this.distance = (i*baseDistance/2 + Math.pow(1.25, 3*i+6) + 1)*8
 	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
-	this.position = new b2Vec2(distance*cos(angle), distance*sin(angle));
 	
 	this.bodyDef = new b2BodyDef;
+	this.bodyDef.position = new b2Vec2(distance*Math.cos(angle), distance*Math.sin(angle));
 	this.bodyDef.type = b2Body.b2_kinematicBody;
-	this.bodyDef.position = new b2Vec2()
 	this.bodyDef.angle = 0;
 	
 	this.body = world.CreateBody(this.bodyDef);
