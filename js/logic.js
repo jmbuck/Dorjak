@@ -223,18 +223,24 @@ function update()
 	
 	for(var i = 0; i < asteroids.length; i++)
 	{
-			for(var j = 1; j < asteroids.length && i < asteroids.length; j++)
+			for(var j = i + 1; j < asteroids.length && i < asteroids.length; j++)
 			{
 				if(collideAsteroids(asteroids[i], asteroids[j]))
-					i = 0, j = 1;
+				{
+					i = 0, j = i + 1;
+				}
 			}
 			for(var j = 0; j < planets.length && i < asteroids.length; j++)
 			{
 				if(collidePlanets(asteroids[i], planets[j]))
+				{
 					i = 0, j = 0;
+				}
 			}
 			if(i < asteroids.length)
+			{
 				collideSun(asteroids[i]);
+			}
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -260,7 +266,9 @@ function update()
 		for(var j = 0; j < planets.length && i < asteroids.length; j++)
 		{
 			if(collidePlanets(asteroids[i], planets[j]))
+			{
 				i = 0, j = 0;
+			}
 		}
 	}
 
@@ -332,16 +340,20 @@ function generateAsteroids()
 
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
-		var asteroid = new Asteroid();
-		asteroids.push(asteroid); //add to array
+		asteroids.push(new Asteroid()); //add to array
 		asteroidId++;
 	 }
 	
 }
 
+function calculateDistance(a, b) { //returns distance between object a and object b
+	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
+					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
+}
+
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
-	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
+	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= (asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius()))
 	{
 		destroyList.push(asteroidOne);
 		destroyList.push(asteroidTwo);
@@ -350,11 +362,6 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 		return true;
 	}
 	return false;
-}
-
-function calculateDistance(a, b) { //returns distance between object a and object b
-	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
-					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
 }
 
 function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
@@ -367,24 +374,15 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function collideAsteroids(asteroidOne, asteroidTwo)
-{
-	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= (asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius()));
-	{
-		destroyList.push(asteroidOne);
-		destroyList.push(asteroidTwo);
-		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
-		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
-	}
-}
-
 function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= (asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius())) {
 		//colliding
 		destroyList.push(asteroid);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
+		return true;
 	}
+	return false;
 }
 
 function collideSun(asteroid)
@@ -392,10 +390,10 @@ function collideSun(asteroid)
 	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
 		destroyList.push(asteroid);
-		clearInterval(interval);
 		self.postMessage({gameStatus : 'gameover', score : score});
-		self.close();
+		return true;
 	}
+	return false;
 }
 
 function Sun()
