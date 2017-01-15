@@ -226,7 +226,7 @@ function update()
 			for(var j = 1; j < asteroids.length && i < asteroids.length; j++)
 			{
 				if(collideAsteroids(asteroids[i], asteroids[j]))
-					i = 0, j = 0;
+					i = 0, j = 1;
 			}
 			for(var j = 0; j < planets.length && i < asteroids.length; j++)
 			{
@@ -235,24 +235,6 @@ function update()
 			}
 			if(i < asteroids.length)
 				collideSun(asteroids[i]);
-	}
-	
-	for(var i = 0; i < asteroids.length; i++)
-	{
-		for(var j = 0; j < asteroids.length && i < asteroids.length; j++)
-		{
-			if(collideAsteroids(asteroids[i], asteroids[j]))
-			{
-				i = 0, j = 0;
-			}
-		}
-		for(var j = 0; j < planets.length && i < asteroids.length; j++)
-		{
-			if(collidePlanets(asteroids[i], planets[j]))
-				i = 0, j = 0;
-		}
-		if(asteroids.length > i)
-			collideSun(asteroids[i]);
 	}
 	
 	//sends gameStatus, asteroids, planets
