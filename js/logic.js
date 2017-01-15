@@ -219,7 +219,7 @@ function initWorld()
 	worldAABB.upperBound.y = screenHeight;
 	
 	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
-	world.SetContactListener(listener);
+	
 	
 	sunObject = new Sun();
 	
@@ -350,7 +350,7 @@ function initWorld()
 			debrisFixtures.splice(debrisIndex, 1);
 		}*/
 	}
-	
+	world.SetContactListener(listener);
 	interval = setInterval(update, 1000 / fps);
 }
 
