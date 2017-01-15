@@ -194,30 +194,10 @@ function update()
 		totalSteps++;
 	}
 	
-	for(var i = 0; i < asteroids.length; i++)
-	{
-		for(var j = 0; j < asteroids.length; j++)
-		{
-			collideAsteroids(asteroids[i], asteroids[i]);
-		}
-		for(var j = 0; j < planets.length; j++)
-		{
-			collidePlanets(asteroids[i], planets[j]);
-		}
-		collideSun(asteroids[i]);
-	}
-	
-	var destroyData = [];
-	
-	for(var i = 0; i < destroyList.length; i++)
-	{
-		destroyData.push({id : destroyList[i].id});
-	}
-	
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
-		for(var j = 0; j < planets.length; j++) {
+		/*for(var j = 0; j < planets.length; j++) {
 			var dist = calculateDistance(asteroids[i], planets[j]); 
 			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
 				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
@@ -229,14 +209,14 @@ function update()
 				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 3;
 				else asteroids[i].bodyDef.linearVelocity.x -= 3;
 			}
-		}
-		var x = asteroids[i].bodyDef.position.x
-		var y = asteroids[i].bodyDef.position.y
+		}*/
+		var x = asteroids[i].bodyDef.position.x;
+		var y = asteroids[i].bodyDef.position.y;
 		asteroids[i].bodyDef.position.x += asteroids[i].bodyDef.linearVelocity.x;
 		asteroids[i].bodyDef.position.y += asteroids[i].bodyDef.linearVelocity.y;
 		//remove asteroid if off screen (plus a little leeway, 15 in this case)
-		if(x > screenWidth+15 || x < -15 || y > screenHeight+15 || y < -15) {
-			destroyList.push(asteroids[i].body)
+		if(asteroids[i].bodyDef.position.x > screenWidth+15 || asteroids[i].bodyDef.position.x < -15 || asteroids[i].bodyDef.position.y > screenHeight+15 || asteroids[i].bodyDef.position.y < -15) {
+			destroyList.push(asteroids[i].body);
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
 			i--;
@@ -247,15 +227,20 @@ function update()
 	
 	for(var i = 0; i < asteroids.length; i++)
 	{
-		for(var j = 0; j < asteroids.length; j++)
+		for(var j = 0; j < asteroids.length && i < asteroids.length; j++)
 		{
-			collideAsteroids(asteroids[i], asteroids[i]);
+			if(collideAsteroids(asteroids[i], asteroids[j]))
+			{
+				i = 0, j = 0;
+			}
 		}
-		for(var j = 0; j < planets.length; j++)
+		for(var j = 0; j < planets.length && i < asteroids.length; j++)
 		{
-			collidePlanets(asteroids[i], planets[j]);
+			if(collidePlanets(asteroids[i], planets[j]))
+				i = 0, j = 0;
 		}
-		collideSun(asteroids[i]);
+		if(asteroids.length > i)
+			collideSun(asteroids[i]);
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -280,10 +265,18 @@ function update()
 	{
 		for(var j = 0; j < planets.length; j++)
 		{
-			collidePlanets(asteroids[i], planets[j]);
+			if(collidePlanets(asteroids[i], planets[j]))
+				i = 0, j = 0;
 		}
 	}
 
+	var destroyData = [];
+	
+	for(var i = 0; i < destroyList.length; i++)
+	{
+		destroyData.push({id : destroyList[i].id});
+	}
+	
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
 	for(var i = 0; i < destroyList.length; i++)
@@ -308,7 +301,7 @@ function initWorld()
 	
 	for(var i = 2; i < 9; i += 2)
 	{
-		var planetObj = new Planet(i, 0, i-1);
+		var planetObj = new Planet(i, 0, i - 1);
 		var planetObj2 = new Planet(i, Math.PI, i);
 		planets.push(planetObj);
 		planets.push(planetObj2);
@@ -348,18 +341,20 @@ function generateAsteroids()
 
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
-	if(calculateDistance(asteroidOne, asteroidTwo) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
+	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
 		destroyList.push(asteroidOne.body);
 		destroyList.push(asteroidTwo.body);
 		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
 		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
+		return true;
 	}
+	return false;
 }
 
 function calculateDistance(a, b) { //returns distance between object a and object b
-	return Math.sqrt((a.bodyDef.position.x - b.bodyDef.position.x)*(a.bodyDef.position.x - b.bodyDef.position.x)+
-					  (a.bodyDef.position.y - b.bodyDef.position.y)*(a.bodyDef.position.y - b.bodyDef.position.y));
+	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
+					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
 }
 
 function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
@@ -374,7 +369,7 @@ function getRandomInt(min, max) {
 
 function collideSun(asteroid)
 {
-	if(calculateDistance(sunObject, asteroid) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
+	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
 		destroyList.push(asteroid.body);
 		clearInterval(interval);
@@ -488,13 +483,14 @@ function Asteroid() {
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
-	
 }
 function collidePlanets(asteroid, planet) {
-	if(calculateDistance(asteroid, planet) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
+	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
 		destroyList.push(asteroid.body);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
+		return true;
 	}
+	return false;
 }
