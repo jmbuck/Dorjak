@@ -183,7 +183,7 @@ function update()
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
 	
-	if(totalSteps == 60) 
+	if(totalSteps == 75) 
 	{
 		generateAsteroids();
 		totalSteps = 0;
@@ -439,16 +439,16 @@ function Planet(planetOrbit, angle, id)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() / 3 + 1 + planetOrbit / 3) * (planetOrbit / 2 + 1));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() / 3 + 1 + planetOrbit / 3) * (planetOrbit / 2 + 3.5));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
 }
 
 function Asteroid() {
-	var minRadius = 5;
-	var maxRadius = 10;
-	var minVel = Math.floor(baseVel / 2);
+	var minRadius = 6;
+	var maxRadius = 12;
+	var minVel = Math.floor(baseVel / 1.9);
 	var maxVel = Math.ceil(baseVel * 2);
 	
 	this.bodyDef = new b2BodyDef; 
@@ -461,7 +461,7 @@ function Asteroid() {
 			 this.bodyDef.position = new b2Vec2(0, getRandomInt(0, screenHeight));
 			 break;
 		case 2: //right
-			 this.bodyDef.position = new b2Vec2(screenWidth-100, getRandomInt(0, screenHeight));
+			 this.bodyDef.position = new b2Vec2(screenWidth, getRandomInt(0, screenHeight));
 			 break;
 	    case 3: //top
 			 var rand = getRandomInt(1, 100);
