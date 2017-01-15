@@ -132,8 +132,10 @@ function update()
 			var asteroid; 
 			if(asteroidsFixtures.indexOf(fixtureA) != -1) {
 				asteroid = asteroidsFixtures.indexOf(fixtureA);
-			else 
+			}
+			else {
 				asteroid = asteroidsFixtures.indexOf(fixtureB);
+			}
 			score++;
 			destroyList.push(asteroids[asteroid]);
 			asteroids.splice(asteroid, 1);

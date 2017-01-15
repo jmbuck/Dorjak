@@ -4,12 +4,25 @@ var widthToScale = 1920;
 var heightToScale = 1080;
 
 $(function() { 
-	start();
+WebFontConfig = {
+  google:{ families: ['game'] },
+  active: function(){start();},
+};
+(function(){
+  var wf = document.createElement("script");
+  wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+  wf.async = 'true';
+  document.head.appendChild(wf);
+})();
 });
 
 function start()
 {
-	gameSession = new menu();
+	gameSession = new game();
+	
+	$(window).resize(function(e) {
+		gameSession.resize();
+	});
 	
 	gameSession.init();
 }
@@ -54,7 +67,7 @@ menu.prototype.startInputHandlers = function()
 
 menu.prototype.mouseMove = function(e)
 {
-	console.log("hello");
+	
 }
 
 menu.prototype.mouseClick = function(e)
@@ -75,7 +88,20 @@ menu.prototype.changeGui = function()
 
 menu.prototype.tick = function()
 {
-	this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
+	this.ctx.beginPath();
+	this.ctx.rect(0, 0, this.width, this.height);
+	this.ctx.fillStyle = 'white';
+	this.ctx.fill();
+	
+	this.ctx.font = "96px game";
+	this.ctx.fillStyle = 'orange';
+	this.ctx.textAlign = 'center';
+	this.ctx.fillText("Dorjax", this.width / 2, 100);
+	this.ctx.strokeText("Dorjax", this.width / 2, 100);
+	
+	//writeText({x : 100, y : 100, font : '70pt game', color : 'black', text : 'Test', ctx : this.ctx, align : 'left'});
+	
+	this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
 }
 
 function game()
@@ -303,3 +329,35 @@ stars.prototype.draw = function(ctx)
 		ctx.stroke();
 	}
 }*/
+
+function writeText(options)
+{
+	var x = options.x;
+	var y = options.y;
+	var font = options.font;
+	var color = options.color;
+	var text = options.text;
+	var ctx = options.ctx;
+	
+	ctx.save();
+	
+	if('shadow' in options)
+	{
+		ctx.shadowColor = options.shadow.color;
+		ctx.shadowOffsetX = options.shadow.x;
+		ctx.shadowOffsetY = options.shadow.y;
+		ctx.shadowBlur = options.shadow.blur;
+	}
+	
+	ctx.font = font;
+	ctx.fillStyle = color;
+	
+	if('align' in options)
+	{
+		ctx.textAlign = options.align;
+	}
+	
+	ctx.fillText( text , x , y);
+	
+	ctx.restore();
+}
