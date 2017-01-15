@@ -40,6 +40,7 @@ var screenHeight = 1080;
 var baseVel = 4;
 var currentOrbit = 0;
 var keys = [];
+var isMultiplayer;
 var thrust;
 var thrustCap = 2;
 var world;
@@ -64,6 +65,7 @@ self.onmessage = function(e)
 	{
 		fps = e.data.fps;
 		startTime = time.getTime();
+		isMultiplayer = e.data.multiplayer;
 		initWorld();
 	} 
 	else if(e.data.gameStatus == "input")
@@ -93,11 +95,14 @@ function update()
 	var timeStep = 1000 / fps;
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
-	var keyPress;
 	var keyA = 0;
 	var keyD = 0;
 	var keyW = 0;
 	var keyS = 0;
+	var keyJ = 0;
+	var keyL = 0;
+	var keyI = 0;
+	var keyK = 0;
 	for(var i = 0; i < keys.length; i++)
 	{
 		if(keys[i] == 'a')
@@ -108,6 +113,20 @@ function update()
 			keyW = 1;
 		if(keys[i] == 's')
 			keyS = 1;
+	}
+	if(isMultiplayer)
+	{
+		for(var i = 0; i < keys.length; i++)
+		{
+			if(keys[i] == 'j')
+				keyJ = 1;
+			if(keys[i] == 'l')
+				keyL = 1;
+			if(keys[i] == 'i')
+				keyI = 1;
+			if(keys[i] == 'k')
+				keyK = 1;
+		}
 	}
 	
 	if(totalSteps == 60) 
