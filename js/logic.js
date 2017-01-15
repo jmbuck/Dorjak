@@ -56,6 +56,7 @@ var debrisFixtures = [];
 var debrisId = 1000;
 var debrisRadius = 5;
 var interval;
+var totalSteps = 0;
 
 self.onmessage = function(e)
 {
@@ -109,11 +110,14 @@ function update()
 			keyS = 1;
 	}
 	
-	var currTime = time.getTime();
-	if(currTime - startTime > asteroidSpawnRate) 
+	if(totalSteps == 60) 
 	{
+		console.log("hello");
+		console.log("hello");
 		generateAsteroids();
-		startTime = currTime;
+		totalSteps = 0;
+	} else {
+		totalSteps++;
 	}
 	selectOrbit(keyW, keyS);
 	movePlanets(keyA, keyD);
@@ -138,8 +142,8 @@ function update()
 			} else {
 				destroyData.push({id: asteroids[asteroid2].id}); 
 			}
-			destroyList.push(asteroids[asteroid1]);
-			destroyList.push(asteroids[asteroid2]);
+			destroyList.push(asteroids[asteroid1].body);
+			destroyList.push(asteroids[asteroid2].body);
 			asteroids.splice(asteroid1, 1);
 			asteroids.splice(asteroid2, 1);
 			asteroidsFixtures.splice(asteroid1, 1);
@@ -160,7 +164,7 @@ function update()
 				explode(asteroid);
 			}
 			score++;
-			destroyList.push(asteroids[asteroid]);
+			destroyList.push(asteroids[asteroid].body);
 			destroyData.push({id: asteroids[asteroid].id});
 			asteroids.splice(asteroid, 1);
 			asteroidsFixtures.splice(asteroid, 1);
@@ -173,9 +177,9 @@ function update()
 		   self.close();
 		}
 		//debris collides with debris
-		if(debrisFixtures.indexOf(fixtureA) != -1 && debrisFixtures.indexOf(fixtureB) != -1) {
-			destroyList.push(debrisFixtures[debrisFixtures.indexOf(fixtureA)]);
-			destroyList.push(debrisFixtures[debrisFixtures.indexOf(fixtureB)]);
+		/*if(debrisFixtures.indexOf(fixtureA) != -1 && debrisFixtures.indexOf(fixtureB) != -1) {
+			destroyList.push(debris[debrisFixtures.indexOf(fixtureA)].body);
+			destroyList.push(debris[debrisFixtures.indexOf(fixtureB)].body);
 			destroyData.push({id: debrisFixtures[debrisFixtures.indexOf(fixtureA)].id});
 			destroyData.push({id: debrisFixtures[debrisFixtures.indexOf(fixtureB)].id});
 			debris.splice(debrisFixtures.indexOf(fixtureA), 1);
@@ -193,7 +197,7 @@ function update()
 			else {
 				debrisIndex = debrisFixtures.indexOf(fixtureB);
 			}
-			destroyList.push(debrisFixtures[debrisIndex]);
+			destroyList.push(debris[debrisIndex].body);
 			destroyData.push({id: debrisFixtures[debrisIndex]});
 			debris.splice(debrisIndex, 1);
 			debrisFixtures.splice(debrisIndex, 1);
@@ -204,29 +208,29 @@ function update()
 			var debrisIndex;
 			if(debrisFixtures.indexOf(fixtureA) != -1) debrisIndex = debrisFixtures.indexOf(fixtureA);
 			else debrisIndex = debrisFixtures.indexOf(fixtureA);
-			destroyList.push(debrisFixtures[debrisIndex]);
+			destroyList.push(debris[debrisIndex].body);
 			destroyData.push({id: debrisFixtures[debrisIndex]});
 			debris.splice(debrisIndex, 1);
 			debrisFixtures.splice(debrisIndex, 1);
-		}
+		}*/
 	}
 	
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
-		for(var j = 0; j < planets.length; j++) {
-			var dist = calculateDistance(asterois[i], planets[j]); 
+		/*for(var j = 0; j < planets.length; j++) {
+			var dist = calculateDistance(asteroids[i], planets[j]); 
 			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
 				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
 				var yDiff = asteroids[i].bodyDef.position.y - planets[j].bodyDef.position.y;
 				//y
-				if(aY < 0) asteroids[i].bodyDef.linearVelocity.y += 3;
+				if(yDiff < 0) asteroids[i].bodyDef.linearVelocity.y += 3;
 				else asteroids[i].bodyDef.linearVelocity.y -= 3;
 				//x
-				if(aX < 0) asteroids[i].bodyDef.linearVelocity.x += 3;
+				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 3;
 				else asteroids[i].bodyDef.linearVelocity.x -= 3;
 			}
-		}
+		}*/
 		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}
 	
@@ -236,7 +240,6 @@ function update()
 		planets[i].arc += planets[i].baseAngularVelocity;
 		planetsData.push({arc : planets[i].arc, id: planets[i].id});
 	}
-	console.log(planetsData[0]);
 	
 	var debrisData = [];
 	for(var i = 0; i < debris.length; i++) {
@@ -244,10 +247,8 @@ function update()
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
-	while(destroyList.length > 0) {
-		world.DestroyBody(destroyList.pop());
-		destroyData.pop();
-	}
+	
+	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
 }
 
 function initWorld()
@@ -264,7 +265,7 @@ function initWorld()
 	
 	sunObject = new Sun();
 	
-	for(var i = 2; i < 10; i += 2)
+	for(var i = 2; i < 9; i += 2)
 	{
 		var planetObj = new Planet(i, 0, i-1);
 		var planetObj2 = new Planet(i, Math.PI, i);
@@ -385,7 +386,7 @@ function Planet(planetOrbit, angle, id)
 	this.id = id;
 	this.arc = angle;
 	this.selected = 0;
-	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) + Math.pow(1.2, 5 * Math.min(planetOrbit, 5)));
+	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) - (planetOrbit > 6 ? 20 : 0) + Math.pow(1.2, 3 * Math.min(planetOrbit, 5)));
 	this.baseAngularVelocity = (planetOrbit == 3 || planetOrbit == 4 ? -1 : 1) * (((10 - planetOrbit)) / 4 ) / this.distance;
 	
 	this.bodyDef = new b2BodyDef;
@@ -396,15 +397,15 @@ function Planet(planetOrbit, angle, id)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 4)*(planetOrbit + 4));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() + planetOrbit / 3)*(planetOrbit + 4));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
 }
 
 function Asteroid() {
-	var minRadius = Math.floor(baseSize / 4);
-	var maxRadius = baseRadius;
+	var minRadius = 5;
+	var maxRadius = 15
 	var minVel = Math.floor(baseVel / 2);
 	var maxVel = Math.ceil(baseVel * 2.5);
 	
@@ -445,7 +446,7 @@ function Asteroid() {
 	this.bodyDef.baseVelocity = velocity;
 	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angleToSun), velocity*Math.sin(angleToSun));
 	this.id = asteroidId;
-	this.body = world.createBody(this.bodyDef);
+	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
 	
 }

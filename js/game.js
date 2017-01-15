@@ -314,6 +314,7 @@ game.prototype.handleEvent = function(e)
 		}
 		for(var i = 0; i < e.data.asteroids.length; i++)
 		{
+			e.data.asteroids[i].sun = gameSession.renderObjects[0];
 			gameSession.renderObjects.push(new asteroid(e.data.asteroids[i]));
 		}
 		
