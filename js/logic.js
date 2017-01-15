@@ -350,7 +350,7 @@ function generateAsteroids()
 	
 }
 
-function collideAsteroids(asteroidOne, asteroidsTwo)
+function collideAsteroids(asteroidOne, asteroidTwo)
 {
 	if(calculateDistance(asteroidOne, asteroidTwo) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwofixtureDef.shape.GetRadius());
 	{
