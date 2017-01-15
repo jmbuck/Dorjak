@@ -38,8 +38,8 @@ var screenHeight = 1080;
 var baseVel = 4;
 var currentOrbit = 0;
 var currentOrbitTwo = 1;
-var playerOneHold;
-var playerTwoHold;
+var playerOneHold = false;
+var playerTwoHold = false;
 var isMultiplayer;
 var thrustCap = 10;
 var world;
@@ -98,17 +98,15 @@ function keyPress(key)
 	{
 		keyD = 1;
 	}
-	else if(key == 'i')
+	else if(key == 'i' && !playerTwoHold)
 	{
 		playerTwoHold = true;
-		currentOrbitTwo = (currentOrbitTwo + 2) % 4;
+		currentOrbitTwo = (currentOrbitTwo == 1 ? 3 : 1);
 	}
-	else if(key == 'k')
+	else if(key == 'k' && !playerTwoHold)
 	{
 		playerTwoHold = true;
-		currentOrbitTwo = (currentOrbitTwo - 2) % 4;
-		if(currentOrbitTwo < 0)
-			currentOrbitTwo = 3;
+		currentOrbitTwo = (currentOrbitTwo == 1 ? 3 : 1);
 	}
 	else if(key == 'j')
 	{
@@ -132,11 +130,11 @@ function keyRelease(key)
 	{
 		playerOneHold = false;
 	}
-	else if(key == 'j')
+	else if(key == 'i')
 	{
 		playerTwoHold = false;
 	}
-	else if(key == 'l')
+	else if(key == 'k')
 	{
 		playerTwoHold = false;
 	}
@@ -165,7 +163,7 @@ function movePlanets(keyA, keyD, keyJ, keyL)
 					planets[i].angularVelocity -= .05;
 			}
 		}
-		if(currentOrbitTwo = Math.floor(i / 2) && isMultiplayer)
+		if(currentOrbitTwo == Math.floor(i / 2) && isMultiplayer)
 		{
 			if((keyJ || keyL) && keyJ != keyL)
 			{
@@ -389,7 +387,8 @@ function getRandomInt(min, max) {
 
 function collideAsteroids(asteroidOne, asteroidTwo)
 {
-	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
+	console.log(asteroidTwo.fixtureDef.shape.GetRadius());
+	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= (asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius()));
 	{
 		destroyList.push(asteroidOne);
 		destroyList.push(asteroidTwo);
@@ -399,7 +398,7 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 }
 
 function collidePlanets(asteroid, planet) {
-	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
+	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= (asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius())) {
 		//colliding
 		destroyList.push(asteroid);
 		score++;
@@ -467,7 +466,7 @@ function Planet(planetOrbit, angle, id)
 
 function Asteroid() {
 	var minRadius = 5;
-	var maxRadius = 15
+	var maxRadius = 10;
 	var minVel = Math.floor(baseVel / 2);
 	var maxVel = Math.ceil(baseVel * 2);
 	
