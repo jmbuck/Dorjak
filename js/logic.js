@@ -29,9 +29,7 @@ var time = new Date();
 var startTime;
 var sunBody;
 var planets = [];
-var planetsFixtures = [];
 var asteroids = [];
-var asteroidFixtures = [];
 var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 100;
 var baseDistance = 20;
@@ -245,7 +243,6 @@ function update()
 			destroyList.push(asteroids[i].body)
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
-			asteroidFixtures.splice(i, 1);
 			i--;
 			continue;
 		}
@@ -319,8 +316,6 @@ function initWorld()
 		var planetObj2 = new Planet(i, Math.PI, i);
 		planets.push(planetObj);
 		planets.push(planetObj2);
-		planetsFixtures.push(planetObj.fixtureDef);
-		planetsFixtures.push(planetObj2.fixtureDef);
 	}
 	score = 0;
 	
@@ -350,7 +345,6 @@ function generateAsteroids()
 		//add to world
 		var asteroid = new Asteroid();
 		asteroids.push(asteroid); //add to array
-		asteroidFixtures.push(asteroid.fixtureDef);
 		asteroidId++;
 	 }
 	
