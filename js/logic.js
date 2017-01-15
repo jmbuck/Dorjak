@@ -29,7 +29,6 @@ var startTime;
 var sunBody;
 var planets = [];
 var asteroids = [];
-var data = [];
 var asteroidSpawnRate = 1000 //in milliseconds
 var baseRadius = 50;
 var screenWidth = 1920;
@@ -40,6 +39,7 @@ var thrust;
 var world;
 var fps;
 var sunRadius = 50;
+var orbitSize = 2;
 
 self.onmessage = function(e)
 {
@@ -104,7 +104,18 @@ function initWorld()
 		planets.push(new planet(i, Math.PI));
 	}
 	
-	postMessage({gameStatus : 'init', sun : {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()}, planets : data});
+	var sunData = {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()};
+	var orbitsData = [];
+	var planetsData = [];
+	for(var i = 0; i < 4; i++)
+	{
+		var radius = baseRadius * Math.pow(1.5, i);
+		orbitsData.push({sun : null, radius : radius, size : orbitSize});
+		
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, size : planets[i * 2].fixtureDef.shape.GetRadius()});
+		planetsData.push({sun : null, radius : radius, arc : planets[i * 2 + 1].arc, size : planets[i * 2 + 1].fixtureDef.shape.GetRadius()});
+	}
+	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData});
 }
 
 function generateAsteroids() {
@@ -209,10 +220,12 @@ function sun()
 
 function planet(planetOrbit, angle)
 {
+	this.arc = angle;
+	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_kinematicBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.sin(angle))
-	this.bodyDef.angle - 0;
+	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.sin(angle));
+	this.bodyDef.angle = 0;
 	
 	this.body = world.CreateBody(this.bodyDef);
 	
