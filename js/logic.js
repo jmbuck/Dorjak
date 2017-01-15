@@ -183,7 +183,7 @@ function update()
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
 	
-	if(totalSteps == 60) 
+	if(totalSteps == 75) 
 	{
 		generateAsteroids();
 		totalSteps = 0;
@@ -196,19 +196,19 @@ function update()
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
-		for(var j = 0; j < planets.length; j++) {
+		/*for(var j = 0; j < planets.length; j++) {
 			var dist = calculateDistance(asteroids[i].bodyDef, planets[j].bodyDef); 
-			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 10) {
+			if(dist - planets[j].fixtureDef.shape.GetRadius() <= 20) {
 				var xDiff = asteroids[i].bodyDef.position.x - planets[j].bodyDef.position.x;
 				var yDiff = asteroids[i].bodyDef.position.y - planets[j].bodyDef.position.y;
 				//y
-				if(yDiff < 0) asteroids[i].bodyDef.linearVelocity.y += 2;
-				else asteroids[i].bodyDef.linearVelocity.y -= 2;
+				if(yDiff < 0) asteroids[i].bodyDef.linearVelocity.y += 4;
+				else asteroids[i].bodyDef.linearVelocity.y -= 4;
 				//x
-				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 2;
-				else asteroids[i].bodyDef.linearVelocity.x -= 2;
+				if(xDiff < 0) asteroids[i].bodyDef.linearVelocity.x += 4;
+				else asteroids[i].bodyDef.linearVelocity.x -= 4;
 			}
-		}
+		}*/
 		var x = asteroids[i].bodyDef.position.x;
 		var y = asteroids[i].bodyDef.position.y;
 		asteroids[i].bodyDef.position.x += asteroids[i].bodyDef.linearVelocity.x;
@@ -439,16 +439,16 @@ function Planet(planetOrbit, angle, id)
 	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape((Math.random() / 3 + 1 + planetOrbit / 3) * (planetOrbit / 2 + 1));
+	this.fixtureDef.shape = new b2CircleShape((Math.random() / 3 + 1 + planetOrbit / 3) * (planetOrbit / 2 + 3.5));
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
 }
 
 function Asteroid() {
-	var minRadius = 5;
-	var maxRadius = 10;
-	var minVel = Math.floor(baseVel / 2);
+	var minRadius = 6;
+	var maxRadius = 12;
+	var minVel = Math.floor(baseVel / 1.9);
 	var maxVel = Math.ceil(baseVel * 2);
 	
 	this.bodyDef = new b2BodyDef; 
@@ -461,7 +461,7 @@ function Asteroid() {
 			 this.bodyDef.position = new b2Vec2(0, getRandomInt(0, screenHeight));
 			 break;
 		case 2: //right
-			 this.bodyDef.position = new b2Vec2(screenWidth-100, getRandomInt(0, screenHeight));
+			 this.bodyDef.position = new b2Vec2(screenWidth, getRandomInt(0, screenHeight));
 			 break;
 	    case 3: //top
 			 var rand = getRandomInt(1, 100);
