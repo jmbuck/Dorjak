@@ -55,6 +55,7 @@ var debris = [];
 var debrisFixtures = [];
 var debrisId = 1000;
 var debrisRadius = 5;
+var interval;
 
 self.onmessage = function(e)
 {
@@ -168,7 +169,7 @@ function update()
 		if((asteroidsFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidsFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) { 
 		   self.postMessage({gameStatus : 'gameover', score: score});
-		   clearInterval();
+		   clearInterval(interval);
 		   self.close();
 		}
 		//debris collides with debris
@@ -246,8 +247,6 @@ function update()
 		world.DestroyBody(destroyList.pop());
 		destroyData.pop();
 	}
-	
-	timer = setTimeout( function() { update(); }  , 1000 / fps);
 }
 
 function initWorld()
@@ -290,7 +289,7 @@ function initWorld()
 	
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData, score: score});
 
-	setInterval(update, 1000 / fps);
+	interval = setInterval(update, 1000 / fps);
 }
 
 function generateAsteroids()
