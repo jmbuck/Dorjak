@@ -260,6 +260,7 @@ function initWorld()
 		{
 			console.log("asteroid-asteroid!");
 			var asteroid = asteroids[asteroids.indexOf(fixtureA.GetBody().GetUserData())];
+			console.log("Index fixA "+ asteroids.indexOf(fixtureA.GetBody().GetUserData()));
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
@@ -269,7 +270,8 @@ function initWorld()
 			asteroids.splice(asteroids.indexOf(fixtureA.GetBody().GetUserData()), 1);
 			//asteroidFixtures.splice(fixtureA, 1);
 			
-			asteroid = asteroids[asteroids.indexOf(fixtureB.GetBody().GetUserData() instanceof Asteroid)];
+			asteroid = asteroids[asteroids.indexOf(fixtureB.GetBody().GetUserData())];
+			console.log("Index fixB "+ asteroids.indexOf(fixtureB.GetBody().GetUserData()));
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
 				explode(asteroid);
