@@ -250,7 +250,7 @@ function update()
 					i = 0, j = 0;
 			}
 			if(i < asteroids.length)
-			collideSun(asteroids[i]);
+				collideSun(asteroids[i]);
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -388,8 +388,8 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 {
 	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
-		destroyList.push(asteroidOne.body);
-		destroyList.push(asteroidTwo.body);
+		destroyList.push(asteroidOne);
+		destroyList.push(asteroidTwo);
 		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
 		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
 	}
@@ -398,7 +398,7 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
-		destroyList.push(asteroid.body);
+		destroyList.push(asteroid);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
 	}

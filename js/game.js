@@ -234,9 +234,8 @@ game.prototype.tick = function(cnt)
 	{
 		for(var j = 8; j < this.renderObjects.length; j++)
 		{
-			if(this.queuedMessages[i].id == this.renderObjects[j].id)
+			if(this.queuedMessages[i] == this.renderObjects[j].id)
 			{
-				console.log(j);
 				this.renderObjects.splice(j, 1);
 				break;
 			}
