@@ -1,8 +1,3 @@
-
-//max speed = 10 mps for higher velocity
-b2Settings.b2_maxTranslation = 10.0;
-b2Settings.b2_maxRotation = 50.0;
-
 /*
 	Load image from asset manager
 */
