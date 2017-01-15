@@ -162,7 +162,7 @@ function movePlanets(keyA, keyD, keyJ, keyL)
 				if(keyD)
 					planets[i].angularVelocity += .05;
 				else
-					planets[i].angularVelocity -= .2;
+					planets[i].angularVelocity -= .05;
 			}
 		}
 		if(currentOrbitTwo = Math.floor(i / 2) && isMultiplayer)
@@ -172,7 +172,7 @@ function movePlanets(keyA, keyD, keyJ, keyL)
 				if(keyL)
 					planets[i].angularVelocity += .05;
 				else
-					planets[i].angularVelocity -= .2;
+					planets[i].angularVelocity -= .05;
 			}
 		}
 	}
