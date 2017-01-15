@@ -39,7 +39,7 @@ var keys = [];
 var thrust;
 var world;
 var fps;
-
+var sunRadius = 50;
 
 self.onmessage = function(e)
 {
@@ -89,104 +89,20 @@ function initWorld()
 {
 	//var gravity = new b2Vec2(0, 0);
 	var worldAABB = new b2AABB();
-	worldAABB.minVertex.x = 0;
-	worldAABB.minVertex.y = 0;
-	worldAABB.maxVertex.x = screenWidth
-	worldAABB.maxVertex.y = screenHeight;
-	world = new b2World(worldAABB, gravity, true);
+	worldAABB.lowerBound.x = 0;
+	worldAABB.lowerBound.y = 0;
+	worldAABB.upperBound.x = screenWidth
+	worldAABB.upperBound.y = screenHeight;
+	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
 	
 	sunObject = new sun();
 	
 	for(var i = 0; i < 8; i += 2)
 	{
-		planets[i] = new planet(i, 0);
-		planets[i + 1] = new planet(i, Math.PI);
+		planets.push(new planet(i, 0));
+		planets.push(new planet(i, Math.PI));
 	}
-	
-	for(var i = 1; i < 11; i++)
-	{
-		var planetCircleDef = new b2CircleDef();
-		var info = new b2Vec3();
-		switch(i) {
-			case 1: planetCircleDef.radius = baseRad*3;
-			break;
-			case 2:planetCircleDef.radius = baseRad*2.25;
-			break;
-			case 3:planetCircleDef.radius = baseRad*1.5;
-			break;
-			case 4:planetCircleDef.radius = baseRad;
-			break;
-			case 7:planetCircleDef.radius = baseRad;
-			break;
-			case 8:planetCircleDef.radius = baseRad*1.5;
-			break;
-			case 9:planetCircleDef.radius = baseRad*2.25;
-			break;
-			case 10:planetCircleDef.radius = baseRad*3;
-			default:
-		}
-		info.rad = planetBody.radius;
-		var planetB = new b2BodyDef();
-		planetB.addShape(planetCircleDef);
-		planetB.position.x = screenWidth/2;
-		planetB.position.y = screenHeight*i/11;
-		planetB.distanceFromSun = Math.abs(planetB.position.y - sun.position.y);
-		switch(i) {
-			case 1:
-				planetB.angleFromSun = Math.PI/2;			
-				planetB.baseVelocity = baseVel/2;
-				planetB.linearVelocity.x = baseVel/2;
-				planetB.linearVelocity.y = 0;
-			break;
-			case 2:
-				planetB.angleFromSun = Math.PI/2;
-				planetB.baseVelocity = baseVel/1.7;
-				planetB.linearVelocity.x = baseVel/1.7;
-				planetB.linearVelocity.y = 0;
-			break;
-			case 3:
-				planetB.angleFromSun = Math.PI/2;
-				planetB.baseVelocity = -baseVel/1.4;
-				planetB.linearVelocity.x = -baseVel/1.4;
-				planetB.linearVelocity.y = 0;
-			break;
-			case 4:
-				planetB.angleFromSun = Math.PI/2;
-				planetB.baseVelocity = baseVel;
-				planetB.linearVelocity.Set(baseVel, 0);
-			break;
-			case 7:
-				planetB.angleFromSun = Math.PI*3/2;
-				planetB.baseVelocity = baseVel;
-				planetB.linearVelocity.Set(baseVel, 0);
-			break;
-			case 8:
-				planetB.angleFromSun = Math.PI*3/2;
-				planetB.baseVelocity = -baseVel/1.4;
-				planetB.linearVelocity.Set(-baseVel/1.4, 0);
-			break;
-			case 9:
-				planetB.angleFromSun = Math.PI*3/2;
-				planetB.baseVelocity = baseVel/1.7;
-				planetB.linearVelocity.Set(baseVel/1.7, 0);
-			break;
-			case 10:
-				planetB.angleFromSun = Math.PI*3/2;
-				planetB.baseVelocity = baseVel/2;
-				planetB.linearVelocity.Set(baseVel/2, 0);
-			default:
-		}
-		var planetBody = world.CreateBody(planetB);
-		info.angle = planetB.angleFromSun;
-		info.dist = planetB.distanceFromSun;
-		planets.push(planetBody);	
-		data.push(info);
-		if(i == 4)
-		{
-			i+= 2;
-		}
-	}	
-	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : data});
+	postMessage({gameStatus : 'init', sun : {x : sun.bodyDef.position.x, y: sun.bodyDef.position.y , radius : sun.m_radius}, planets : data});
 }
 
 function generateAsteroids() {
@@ -280,7 +196,7 @@ function sun()
 	this.bodyDef.position = new b2Vec2(screenWidth / 2, screenHeight / 2);
 	this.bodyDef.angle = 0;
 	
-	this.body = world.CreateBody(bodyDef);
+	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
 	this.fixtureDef.shape = new b2CircleShape(sunRadius);
@@ -289,14 +205,14 @@ function sun()
 	this.body.CreateFixture(this.fixtureDef);
 }
 
-function planet(var planetOrbit, var angle)
+function planet(planetOrbit, angle)
 {
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.sin(angle))
 	this.bodyDef.angle - 0;
 	
-	this.body = world.CreateBody(bodyDef);
+	this.body = world.CreateBody(this.bodyDef);
 	
 	this.fixtureDef = new b2FixtureDef;
 	this.fixtureDef.shape = new b2CircleShape((Math.random() / 2 + .75) * Math.pow(2, i));
