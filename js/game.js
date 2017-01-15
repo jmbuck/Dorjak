@@ -232,7 +232,7 @@ game.prototype.tick = function(cnt)
 {
 	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
-		for(var j = 0; j < this.renderObjects.length; j++)
+		for(var j = 8; j < this.renderObjects.length; j++)
 		{
 			if(this.queuedMessages[i].id == this.renderObjects[j].id)
 			{
@@ -241,6 +241,7 @@ game.prototype.tick = function(cnt)
 			}
 		}
 	}
+	this.queuedMessages = [];
 	
 	if(this.renderObjects.length > 0)
 	{
