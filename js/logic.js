@@ -50,10 +50,6 @@ var sunObject;
 var destroyList = [];
 var score;
 var asteroidId = 13;
-var debris = [];
-var debrisFixtures = [];
-var debrisId = 1000;
-var debrisRadius = 5;
 var interval;
 var totalSteps = 0;
 
@@ -289,7 +285,7 @@ function update()
 	}
 
 	//destroyed items will have an "explode" flag set to true if they explode
-	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
+	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
 	for(var i = 0; i < destroyList.length; i++)
 	{
 		world.DestroyBody(destroyList[i]);
@@ -494,38 +490,7 @@ function Asteroid() {
 	this.body.CreateFixture(this.fixtureDef);
 	
 }
-
-function Debris(x, y, angle) {
-	this.id = id;
-	
-	this.bodyDef = new b2BodyDef;
-	this.bodyDef.position = new b2Vec2(x, y);
-	this.bodyDef.type = b2Body.b2_dynamicBody;
-	
-	this.body = world.CreateBody(this.bodyDef);
-	
-	this.fixtureDef = new b2FixtureDef;
-	this.fixtureDef.shape = new b2CircleShape(debrisRadius);
-	this.fixtureDef.density = 1;
-	var velocity = Math.ceil(baseVel*1.75);
-	this.bodyDef.linearVelocity = new b2Vec2(velocity*Math.cos(angle), velocity*Math.sin(angle));
-	this.body.CreateFixture(this.fixtureDef);
-	
-	
-}
-
-function explode(asteroid) {
-	var x = asteroid.bodyDef.position.x;
-	var y = asteroid.bodyDef.position.y;
-	angle = Math.PI/5; 
-	for(var i = 0; i < 10; i++) {
-		var debrisObject = new Debris(x, y, angle);
-		debris.push(debrisObject);
-		debrisFixtures.push(debrisObject.fixtureDef);
-		angle += (Math.PI/5);
-		debrisId++;
-	}	
-}function collidePlanets(asteroid, planet) {
+function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid, planet) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
 		destroyList.push(asteroid.body);
