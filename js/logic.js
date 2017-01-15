@@ -193,7 +193,25 @@ function update()
 	{
 		totalSteps++;
 	}
+<<<<<<< HEAD
 	
+=======
+	for(var i = 0; i < asteroids.length; i++){
+		
+		{
+				for(var j = 1; j < asteroids.length; j++)
+				{
+					collideAsteroids(asteroids[i], asteroids[j]);
+				}
+			for(var j = 0; j < planets.length; j++)
+			{
+				collidePlanets(asteroids[i], planets[j]);
+			}
+			collideSun(asteroids[i]);
+		}
+	}
+
+>>>>>>> 8f5f2c88afe5a8c06169dbc7691460598d3e7a11
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
@@ -216,13 +234,27 @@ function update()
 		asteroids[i].bodyDef.position.y += asteroids[i].bodyDef.linearVelocity.y;
 		//remove asteroid if off screen (plus a little leeway, 15 in this case)
 		if(asteroids[i].bodyDef.position.x > screenWidth+15 || asteroids[i].bodyDef.position.x < -15 || asteroids[i].bodyDef.position.y > screenHeight+15 || asteroids[i].bodyDef.position.y < -15) {
-			destroyList.push(asteroids[i].body);
-			destroyData.push({id: asteroids[i].id});
+			destroyList.push(asteroids[i]);
 			asteroids.splice(i, 1);
 			i--;
 			continue;
 		}
-		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
+	}
+	
+	for(var i = 0; i < asteroids.length; i++)
+	{
+			for(var j = 1; j < asteroids.length && i < asteroids.length; j++)
+			{
+				if(collideAsteroids(asteroids[i], asteroids[j]))
+					i = 0, j = 0;
+			}
+			for(var j = 0; j < planets.length && i < asteroids.length; j++)
+			{
+				if(collidePlanets(asteroids[i], planets[j]))
+					i = 0, j = 0;
+			}
+			if(i < asteroids.length)
+			collideSun(asteroids[i]);
 	}
 	
 	for(var i = 0; i < asteroids.length; i++)
@@ -263,7 +295,7 @@ function update()
 	
 	for(var i = 0; i < asteroids.length; i++)
 	{
-		for(var j = 0; j < planets.length; j++)
+		for(var j = 0; j < planets.length && i < asteroids.length; j++)
 		{
 			if(collidePlanets(asteroids[i], planets[j]))
 				i = 0, j = 0;
@@ -277,14 +309,20 @@ function update()
 		destroyData.push({id : destroyList[i].id});
 	}
 	
+	for(var i = 0; i < asteroids.length; i++)
+	{
+		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
+	}
+	
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
 	for(var i = 0; i < destroyList.length; i++)
 	{
-		world.DestroyBody(destroyList[i]);
+		world.DestroyBody(destroyList[i].body);
 	}
 	destroyList = [];
 }
+
 
 function initWorld()
 {
@@ -343,8 +381,8 @@ function collideAsteroids(asteroidOne, asteroidTwo)
 {
 	if(calculateDistance(asteroidOne.bodyDef, asteroidTwo.bodyDef) <= asteroidOne.fixtureDef.shape.GetRadius() + asteroidTwo.fixtureDef.shape.GetRadius());
 	{
-		destroyList.push(asteroidOne.body);
-		destroyList.push(asteroidTwo.body);
+		destroyList.push(asteroidOne);
+		destroyList.push(asteroidTwo);
 		asteroids.splice(asteroids.indexOf(asteroidOne), 1);
 		asteroids.splice(asteroids.indexOf(asteroidTwo), 1);
 		return true;
@@ -371,7 +409,7 @@ function collideSun(asteroid)
 {
 	if(calculateDistance(sunObject.bodyDef, asteroid.bodyDef) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
-		destroyList.push(asteroid.body);
+		destroyList.push(asteroid);
 		clearInterval(interval);
 		self.postMessage({gameStatus : 'gameover', score : score});
 		self.close();
@@ -487,7 +525,7 @@ function Asteroid() {
 function collidePlanets(asteroid, planet) {
 	if(calculateDistance(asteroid.bodyDef, planet.bodyDef) <= asteroid.fixtureDef.shape.GetRadius() + planet.fixtureDef.shape.GetRadius()) {
 		//colliding
-		destroyList.push(asteroid.body);
+		destroyList.push(asteroid);
 		score++;
 		asteroids.splice(asteroids.indexOf(asteroid), 1);
 		return true;
