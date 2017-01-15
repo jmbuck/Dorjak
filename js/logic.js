@@ -154,7 +154,7 @@ function update()
 	}
 	var planetsData = [];
 	for(planet in planets) {
-		planetsData.push({sun : null, radius : radius, arc : planets[i * 2].arc, radius : planets[i * 2].fixtureDef.shape.GetRadius()});
+		planetsData.push({sun : null, radius : radius, arc : planet.arc, radius : planet.fixtureDef.shape.GetRadius()});
 	}
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, planets: planetsData);
 	
