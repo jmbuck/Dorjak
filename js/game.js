@@ -24,6 +24,8 @@ function game()
 	this.on = true;
 	this.paused = false;
 	
+	this.scaleWidth = this.scaleHeight = 1;
+	
 	this.renderObjects = [];
 	this.queuedMessages = [];
 	
@@ -44,6 +46,11 @@ game.prototype.init = function()
 	
 	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps});
 	
+	//this.renderObjects.push(new stars({count : 200}));
+	this.renderObjects.push(new sun({x : this.ctx.canvas.width / 2, y : this.ctx.canvas.height / 2, radius : 50}));
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : 0, size : 10}));
+	this.tick();
+	
 	console.log('Finished Loading');
 }
 
@@ -61,7 +68,7 @@ game.prototype.resize = function()
 
 game.prototype.tick = function(cnt)
 {
-	if(this.gameObjects.length > 0)
+	if(this.renderObjects.length > 0)
 	{
 		if(this.paused)
 		{
@@ -77,16 +84,22 @@ game.prototype.tick = function(cnt)
 			this.draw();
 		}
 	}
-	this.timer = setTimeout( function() { that.tick(); }  , 1000 / this.fps);
+	this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 }
 
 game.prototype.draw = function()
 {
 	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
 	
+	this.ctx.lineWidth = 1;
+	this.ctx.beginPath();
+    this.ctx.fillStyle = 'orange';
+    this.ctx.fill();
+    this.ctx.strokeStyle = 'black';
+    this.ctx.stroke();
 	for(var i = 0; i < this.renderObjects.length; i++)
 	{
-		this.renderObjects[i].draw({context : this.ctx, width : this.scaleWidth, height : this.scaleHeight});
+		this.renderObjects[i].draw(this.ctx);
 	}
 }
 
@@ -136,17 +149,13 @@ function sun(data)
 	this.radius = data.radius;
 }
 
-sun.prototype.draw = function(context)
+sun.prototype.draw = function(ctx)
 {
-	var ctx = context.ctx;
-	var scaleWidth = context.width;
-	var scaleHeight = context.height;
-	
+	ctx.lineWidth = .5;
 	ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = 'orange';
     ctx.fill();
-    ctx.lineWidth = 5;
     ctx.strokeStyle = 'black';
     ctx.stroke();
 }
@@ -155,10 +164,50 @@ function planet(data)
 {
 	this.sun = data.sun;
 	this.radius = data.radius;
-	this.arc = data.sun;
+	this.arc = data.arc;
+	this.size = data.size;
 }
 
-planet.prototype.draw = function(context)
+planet.prototype.draw = function(ctx)
 {
+	ctx.beginPath();
+	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = 'black';
+	ctx.stroke();
 	
+	ctx.beginPath();
+	ctx.arc(this.sun.x + (this.sun.radius + this.radius) * Math.cos(this.arc), this.sun.y + (this.sun.radius + this.radius) * Math.sin(this.arc), this.size, 0, Math.PI * 2);
+	ctx.fillStyle = 'white';
+	ctx.fill();
+	ctx.strokeStyle = 'black';
+	ctx.lineWidth = 1;
+	ctx.stroke();
 }
+
+/*function stars(data)
+{
+	this.count = data.count;
+	this.starSystem = [];
+	for(var i = 0; i < this.count; i++)
+	{
+		this.starSystem.push({x : Math.random() * (gameSession.canvas.width - 20 + 1) + 20, y : Math.random() * (gameSession.canvas.height - 20 + 1) + 20});
+	}
+}
+
+stars.prototype.draw = function(ctx)
+{
+	ctx.beginPath();
+	ctx.rect(0, 0, gameSession.canvas.width, gameSession.canvas.height);
+	ctx.fillStyle = 'black';
+	ctx.fill();
+	var size = .1;
+	for(var i = 0; i < this.starSystem.length; i++)
+	{
+		ctx.beginPath();
+		ctx.rect(this.starSystem[i].x - size, this.starSystem[i].y - size, 2 * size, 2 * size);
+		ctx.lineWidth = 1.5;
+		ctx.strokeStyle = 'white';
+		ctx.stroke();
+	}
+}*/
