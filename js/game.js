@@ -98,17 +98,15 @@ menu.prototype.tick = function()
 	this.ctx.textAlign = 'center';
 	this.ctx.fillText("Dorjak", this.width / 2, 100);
 	this.ctx.strokeText("Dorjak", this.width / 2, 100);
-	
-	//writeText({x : 100, y : 100, font : '70pt game', color : 'black', text : 'Test', ctx : this.ctx, align : 'left'});
-	
+		
 	this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
 }
 
 function game()
 {
 	this.fps = 60;
-	this.paused = false;
-	this.gameover = false;
+	this.paused = 0;
+	this.ticks = 0;
 	
 	this.scaleWidth = this.scaleHeight = 1;
 	
@@ -121,6 +119,8 @@ function game()
 
 game.prototype.init = function()
 {
+	this.score = 0;
+	
 	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
 	
@@ -150,9 +150,83 @@ game.prototype.resize = function()
 
 game.prototype.tick = function(cnt)
 {
+	for(var data in this.queuedMessages)
+	{
+		if(data.gameStatus === 'update')
+		{
+			console.log("this");
+			for(var object in this.renderObjects)
+			{
+				if(object instanceof planet)
+				{
+					for(var i = 0; i < data.planets.length; i++)
+					{
+						if(data.planets[i].id == object.id)
+						{
+							object.x = data.planets[i].x;
+							object.y = data.planets[i].y;
+						}
+					}
+				}
+			}
+		}
+		else if(e.data.gameStatus === 'gameover')
+		{
+			this.paused = 2;
+			this.score = data.score;
+		}
+	}
 	if(this.renderObjects.length > 0)
 	{
-		if(this.paused)
+		if(this.paused === 2)
+		{
+			var sunObject = this.renderObjects[0];
+			
+			this.ticks ++;
+			this.draw();
+			if(this.ticks < 60)
+			{
+				this.ctx.lineWidth = .5;
+				this.ctx.beginPath();
+				this.ctx.arc(sunObject.x, sunObject.y, sunObject.radius, 0, 2 * Math.PI, false);
+				this.ctx.fillStyle = this.ticks % 10 < 5 ? 'red' : 'orange';
+				this.ctx.fill();
+				this.ctx.strokeStyle = 'black';
+				this.ctx.stroke();
+			}
+			else
+			{
+				this.ctx.lineWidth = 2;
+				this.ctx.beginPath();
+				this.ctx.arc(sunObject.x, sunObject.y, sunObject.radius, 0, 2 * Math.PI, false);
+				this.ctx.fillStyle = 'white';
+				this.ctx.fill();
+				this.ctx.strokeStyle = 'white';
+				this.ctx.stroke();
+				
+				this.ctx.lineWidth = 1;
+				this.ctx.fillStyle = this.ctx.strokeStyle = 'black';
+				for(var j = 0; j < 5; j++)
+				{
+					if(this.ticks - 60 - j * 2 > 0) {
+				for(var i = 0; i < 2 * Math.PI; i += Math.PI / 10)
+				{
+					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
+					var sin = Math.sin(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.width / 2 + 15 * cos, this.height / 2 + sin * 15);
+					this.ctx.lineTo(this.width / 2 + 35 * cos, this.height / 2 + sin * 35);
+					this.ctx.fill();
+					this.ctx.stroke();
+				}}
+				}
+				this.ctx.font = "48px game";
+				this.ctx.textAlign = 'center';
+				this.ctx.fillText(this.score, this.width / 2, this.height / 2 + 16);
+			}
+			this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
+		}
+		else if(this.paused === 1)
 		{
 			
 		}
@@ -166,14 +240,12 @@ game.prototype.tick = function(cnt)
 
 game.prototype.draw = function()
 {
-	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
+	this.ctx.clearRect(0, 0, this.width, this.height);
 	
 	for(var i = 0; i < this.renderObjects.length; i++)
 	{
 		this.renderObjects[i].draw(this.ctx);
 	}
-	
-	console.log(this.renderObjects);
 }
 
 game.prototype.handleEvent = function(e)
@@ -204,14 +276,6 @@ game.prototype.handleEvent = function(e)
 		
 		gameSession.tick();
 	}
-	else if(e.data.gameStatus === 'update')
-	{
-		
-	}
-	else if(e.data.gameStatus === 'gameover')
-	{
-		this.gameover = true;
-	}
 	else
 	{
 		gameSession.queuedMessages.push(e.data);
@@ -226,13 +290,46 @@ game.prototype.startInputHandlers = function()
 
 game.prototype.keyPress = function(e)
 {
-	this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});
+	if(this.paused === 0)
+	{
+		if(e.key == 32)
+		{
+			gameSession = new menu;
+			
+			gameSession.init();
+		}
+		else
+		{
+			this.fps = 60;
+			this.paused = 0;
+			this.ticks = 0;
+
+			this.scaleWidth = this.scaleHeight = 1;
+
+			this.renderObjects = [];
+			this.queuedMessages = [];
+	
+			this.timeElapsed = 0;
+			this.destroyObjects = [];
+			
+			this.init();
+		}
+	}
+	else if(this.paused == 1)
+	{
+		
+	}
+	else
+	{
+		this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});	
+	}
 	return false;
 }
 
 game.prototype.keyRelease = function(e)
 {
-	this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
+	if(this.paused === 3)
+		this.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 0});
 	return false;
 }
 
@@ -282,6 +379,7 @@ orbit.prototype.draw = function(ctx)
 
 function planet(data)
 {
+	this.id = data.id;
 	this.sun = data.sun;
 	this.radius = data.radius;
 	this.arc = data.arc;
@@ -297,6 +395,35 @@ planet.prototype.draw = function(ctx)
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 1.5;
 	ctx.stroke();
+}
+
+function asteroid(data)
+{
+	this.id = data.id;
+	this.sun = data.sun;
+	this.x = data.x;
+	this.y = data.y;
+	this.radius = data.radius;
 	
-	this.arc -= Math.PI / (Math.pow(Math.log(this.radius), 4));
+	if('tailX' in data)
+	{
+		this.tailX = data.tailX;
+		this.tailY = data.tailY;
+	}
+	else
+	{
+		this.tailX = 0;
+		this.tailY = 0;
+	}
+}
+
+asteroid.prototype.draw = function(ctx)
+{
+	var angle = Math.atan2(this.x - this.sun.x, this.y - this.sun.y);
+	
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.radius, angle - Math.PI / 3, angle + Math.PI / 3);
+	ctx.strokeStyle = 'black';
+	ctx.lineWidth = 4;
+	ctx.stroke();
 }

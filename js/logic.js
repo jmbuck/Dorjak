@@ -167,11 +167,11 @@ function update()
 	//sends gameStatus, asteroids, planets
 	var asteroidsData = [];
 	for(asteroid in asteroids) {
-		asteroidsData.push({x: asteroid.asteroid.bodyDef.position.x, y: asteroid.asteroid.bodyDef.position.y, radius: asteroid.asteroid.fixtureDef.shape.GetRadius(), id: asteroid.id});
+		asteroidsData.push({sun : null, x: asteroid.bodyDef.position.x, y: asteroid.bodyDef.position.y, radius: asteroid.fixtureDef.shape.GetRadius(), id: asteroid.id});
 	}
 	var planetsData = [];
 	for(planet in planets) {
-		planetsData.push({sun : null, radius : radius, arc : planet.planet.arc, radius : planet.planet.fixtureDef.shape.GetRadius(), id: planet.id});
+		planetsData.push({sun : null, radius : planet.distance, arc : planet.planet.arc, radius : planet.planet.fixtureDef.shape.GetRadius(), id: planet.id});
 	}
 	
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData});
@@ -201,7 +201,7 @@ function initWorld()
 	{
 		var planetObj = new Planet(i, 0);
 		var planetObj2 = new Planet(i, Math.PI);
-		planets.push({id: i-1, planet: planetObj});
+		planets.push({id: i - 1, planet: planetObj});
 		planets.push({id: i, planet: planetObj2});
 		planetsFixtures.push(planetObj.fixtureDef);
 		planetsFixtures.push(planetObj2.fixtureDef);
@@ -221,6 +221,8 @@ function initWorld()
 	}
 	
 	self.postMessage({gameStatus : 'init', sun : sunData, orbits : orbitsData, planets : planetsData, score: score});
+	
+	update();
 }
 
 function generateAsteroids()
