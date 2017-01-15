@@ -245,7 +245,7 @@ game.prototype.tick = function(cnt)
 	
 	if(this.renderObjects.length > 0)
 	{
-		if(this.paused === 0)
+		if(this.paused === 2)
 		{
 			var sunObject = this.renderObjects[0];
 			
