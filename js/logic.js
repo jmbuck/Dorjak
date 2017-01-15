@@ -38,7 +38,7 @@ var baseDistance = 10;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
-var currentPlanet = 0;
+var currentOrbit = 0;
 var keys = [];
 var thrust;
 var thrustCap = 2;
@@ -92,13 +92,13 @@ function update()
 	var keyS = 0;
 	for(var i = 0; i < keys.length; i++)
 	{
-		if(keys[i] === 'a')
+		if(keys[i] == 'a')
 			keyA = 1;
-		if(keys[i] === 'd')
+		if(keys[i] == 'd')
 			keyD = 1;
-		if(keys[i] === 'w')
+		if(keys[i] == 'w')
 			keyW = 1;
-		if(keys[i] === 's')
+		if(keys[i] == 's')
 			keyS = 1;
 	}
 	
@@ -108,6 +108,8 @@ function update()
 		startTime = currTime;
 		generateAsteroids();
 	}
+	selectOrbit(keyW, keyS);
+	movePlanets(keyA, keyD);
 	
 	listener.BeginContact = function(contact) {
 		var fixtureA = contact.GetFixtureA();
@@ -210,6 +212,21 @@ function generateAsteroids()
 		asteroidsFixtures.push(asteroid.fixtureDef);
 	 }
 	
+}
+
+function selectOrbit(keyW, keyS)
+{
+	if(keyW && currentOrbit != 3)
+		currentOrbit++;
+	else if(keyS && currentOrbit != 0)
+		currentOrbit--;
+	for(var i = 0; i < 8; i++)
+	{
+		if(Math.floor(i/2) == currentOrbit)
+			planets[i].selected = 1;
+		else
+			planets[i].selected = 0;
+	}
 }
 
 function movePlanets(keyA, keyD)
