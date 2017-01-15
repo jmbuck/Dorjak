@@ -196,8 +196,8 @@ function update()
 			debrisFixtures.splice(debrisIndex, 1);
 		}
 		//debris collides with planet or sun 
-		if(debrisFixtures.indexOf(fixtureA) != -1 && (planetsFixtures.indexOf(fixtureB) != -1 || sunObject.fixtureDef == fixtureB) ||
-			debrisFixtures.indexOf(fixtureB) != -1 && (planetsFixtures.indexOf(fixtureA) != -1 || sunObject.fixtureDef == fixtureA) {
+		if((debrisFixtures.indexOf(fixtureA) != -1 && (planetsFixtures.indexOf(fixtureB) != -1 || sunObject.fixtureDef == fixtureB)) ||
+			(debrisFixtures.indexOf(fixtureB) != -1 && (planetsFixtures.indexOf(fixtureA) != -1 || sunObject.fixtureDef == fixtureA))) {
 			var debrisIndex;
 			if(debrisFixtures.indexOf(fixtureA) != -1) debrisIndex = debrisFixtures.indexOf(fixtureA);
 			else debrisIndex = debrisFixtures.indexOf(fixtureA);
@@ -236,7 +236,7 @@ function update()
 	
 	var debrisData = [];
 	for(d in debris) {
-		debrisData.push{x: d.bodyDef.position.x, y: d.bodyDef.position.y, radius: debrisRadius, id: d.id});
+		debrisData.push({x: d.bodyDef.position.x, y: d.bodyDef.position.y, radius: debrisRadius, id: d.id});
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
@@ -472,7 +472,7 @@ function explode(asteroid) {
 	var x = asteroid.bodyDef.position.x;
 	var y = asteroid.bodyDef.position.y;
 	angle = Math.PI/5; 
-	for(int i = 0; i < 10; i++) {
+	for(var i = 0; i < 10; i++) {
 		var debrisObject = new Debris(x, y, angle);
 		debris.push(debrisObject);
 		debrisFixtures.push(debrisObject.fixtureDef);
