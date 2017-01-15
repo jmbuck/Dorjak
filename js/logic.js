@@ -338,7 +338,7 @@ function initWorld()
 function generateAsteroids()
 {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
-	 if(isMultiplayer) numAsteroids++;
+	 if(isMultiplayer) numAsteroids+=2;
 	 
 	 for(var i = 0; i < numAsteroids; i++) {
 		//add to world
@@ -452,10 +452,10 @@ function Asteroid() {
 	var minVel;
 	var maxVel;
 	if(isMultiplayer) {
-		minRadius = 7;
-		maxRadius = 13;
-		minVel = Math.floor(baseVel / 1.9);
-		maxVel = Math.ceil(baseVel*2.2);
+		minRadius = 4;
+		maxRadius = 10;
+		minVel = Math.floor(baseVel / 1.75);
+		maxVel = Math.ceil(baseVel*2.4);
 	} else {
 		minRadius = 6;
 		maxRadius = 12;
