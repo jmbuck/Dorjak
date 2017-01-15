@@ -179,8 +179,8 @@ function movePlanets(keyA, keyD)
 }
 
 function calculateDistance(a, b) { //returns distance between object a and object b
-	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
-					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
+	return Math.sqrt((a.bodyDef.position.x - b.bodyDef.position.x)*(a.bodyDef.position.x - b.bodyDef.position.x)+
+					  (a.bodyDef.position.y - b.bodyDef.position.y)*(a.bodyDef.position.y - b.bodyDef.position.y));
 }
 
 function calculateAngle(current, target) { //returns angle to target (typically sun) in radians
@@ -213,13 +213,13 @@ function Planet(planetOrbit, angle)
 {
 	this.arc = angle;
 	this.selected = 0;
-	this.distance = calculateDistance(this, sun);
 	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.sin(angle))
 	this.bodyDef.angle = 0;
+	this.distance = calculateDistance(this, sunObject);
 	
 	this.body = world.CreateBody(this.bodyDef);
 	
