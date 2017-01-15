@@ -230,12 +230,15 @@ game.prototype.resize = function()
 
 game.prototype.tick = function(cnt)
 {
+	if(this.queuedMessages.length > 0)
+		console.log("Deleting " + this.queuedMessages.length);
 	for(var i = 0; i < this.queuedMessages.length; i++)
 	{
 		for(var j = 8; j < this.renderObjects.length; j++)
 		{
 			if(this.queuedMessages[i].id == this.renderObjects[j].id)
 			{
+				console.log(j);
 				this.renderObjects.splice(j, 1);
 				break;
 			}
@@ -385,12 +388,10 @@ game.prototype.handleEvent = function(e)
 			gameSession.renderObjects.push(new asteroid(e.data.asteroids[i]));
 		}
 		
-		var destroyObjects = [];
 		for(var i = 0; i < e.data.destroyed.length; i++)
 		{
-			destroyObjects.push(e.data.destroyed[i]);
+			gameSession.queuedMessages.push(e.data.destroyed[i]);
 		}
-		gameSession.queuedMessages.push(destroyObjects);
 	}
 	else
 	{

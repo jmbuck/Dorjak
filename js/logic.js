@@ -443,8 +443,8 @@ function getRandomInt(min, max) {
 function Sun()
 {
 	this.bodyDef = new b2BodyDef;
-	this.bodyDef.type = b2Body.b2_dynamicBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2, screenHeight / 2);
+	this.bodyDef.type = b2Body.b2_staticBody;
+	this.bodyDef.position = new b2Vec2(screenWidth/2, screenHeight/2);
 	this.bodyDef.angle = 0;
 	this.bodyDef.userData = this;
 	
@@ -529,16 +529,13 @@ function Asteroid() {
 	//this.bodyDef.baseVelocity = velocity;
 	if(triangleBase < 0) 
 		this.bodyDef.linearVelocity.x =  velocity;
-	else 
-		this.bodyDef.linearVelocity.x =  -velocity;
-	
+	else
+		this.bodyDef.linearVelocity.x = -velocity;
 	if (triangleHeight < 0)
 		this.bodyDef.linearVelocity.y = ratio * velocity;
 	else
-		this.bodyDef.linearVelocity.y = -ratio * velocity;
+		this.bodyDef.linearVelocity.y = -Math.abs(ratio) * velocity;
 	
-	console.log(this.bodyDef.position.x + " " + this.bodyDef.position.y + " " + triangleHeight + " " + triangleBase + " " + ratio);
-	console.log("--" + this.bodyDef.linearVelocity.x + " " + this.bodyDef.linearVelocity.y);
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
