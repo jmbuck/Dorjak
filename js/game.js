@@ -96,8 +96,8 @@ menu.prototype.tick = function()
 	this.ctx.font = "96px game";
 	this.ctx.fillStyle = 'orange';
 	this.ctx.textAlign = 'center';
-	this.ctx.fillText("Dorjax", this.width / 2, 100);
-	this.ctx.strokeText("Dorjax", this.width / 2, 100);
+	this.ctx.fillText("Dorjak", this.width / 2, 100);
+	this.ctx.strokeText("Dorjak", this.width / 2, 100);
 	
 	//writeText({x : 100, y : 100, font : '70pt game', color : 'black', text : 'Test', ctx : this.ctx, align : 'left'});
 	
@@ -130,20 +130,8 @@ game.prototype.init = function()
 	this.logicHandler = new Worker("./js/logic.js");
 	
 	this.logicHandler.addEventListener('message', this.handleEvent);
-	
 	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps});
 	
-	//this.renderObjects.push(new stars({count : 200}));
-	//this.renderObjects.push(new sun({x : this.ctx.canvas.width / 2, y : this.ctx.canvas.height / 2, radius : 50}));
-	/*this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 60, size : 1}));
-	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 100, size : 1}));
-	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 160, size : 1}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : 0, size : 10}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 160, arc : 0, size : 8}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 160, arc : Math.PI, size : 12}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : Math.PI, size : 15}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : 0, size : 3}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : Math.PI, size : 5}));*/
 	this.tick();
 }
 
