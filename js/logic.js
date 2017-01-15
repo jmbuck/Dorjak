@@ -148,10 +148,6 @@ function update()
 		}
 	}
 	
-	//destroy all objects to be destroyed
-	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
-	
-	
 	//sends gameStatus, asteroids, planets
 	var asteroidsData = [];
 	for(asteroid in asteroids) {
@@ -161,7 +157,8 @@ function update()
 	for(planet in planets) {
 		planetsData.push({sun : null, radius : radius, arc : planet.arc, radius : planet.fixtureDef.shape.GetRadius()});
 	}
-	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, planets: planetsData, score: score});
+	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyedAsteroids: destroyList, planets: planetsData, score: score});
+	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
 	
 	timer = setTimeout( function() { update(); }  , 1000 / fps);
 }
