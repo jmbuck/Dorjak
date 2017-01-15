@@ -82,30 +82,47 @@ function generateAsteroids() {
 function initWorld()
 {
 	var gravity = new b2Vec2(0, 0);
-	world = new b2World(gravity, true);
+	var worldAABB = new b2AABB();
+	worldAABB.minVertex.Set(0,0);
+	worldAABB.maxVertex.Set(screenWidth, screenHeight);
+	world = new b2World(worldAABB, gravity, true);
 	sun.m_position.Set(screenWidth/2, screenHeight/2);
 	sun.m_radius = baseRad*5;
 	world.CreateBody(sun);
 	
 	for(var i = 1; i < 11; i++)
 	{
-		var planet = Box2D.Collision.Shapes.b2CircleShape;
-		planet.m_position.Set(screenWidth/2, screenHeight*i/11);
-		world.CreateBody(planet);
-		planets.push(planet);
+		var planetCircleDef = new b2CircleDef();
+		switch(i) {
+			case 1: planetCircleDef.radius = baseRad*3;
+			x = 
+			break;
+			case 2:planetCircleDef.radius = baseRad*2.25;
+			break;
+			case 3:planetCircleDef.radius = baseRad*1.5;
+			break;
+			case 4:planetCircleDef.radius = baseRad;
+			break;
+			case 7:planetCircleDef.radius = baseRad;
+			break;
+			case 8:planetCircleDef.radius = baseRad*1.5;
+			break;
+			case 9:planetCircleDef.radius = baseRad*2.25;
+			break;
+			case 10:planetCircleDef.radius = baseRad*3;
+			break;
+			default:
+		}
+		var planetB = new b2BodyDef();
+		planetB.addShape(planetCircleDef);
+		planetB.position.Set(screenWidth/2, screenHeight*i/11);
+		var planetBody = world.CreateBody(planetB);
+		planets.push(planetBody);
 		if(i == 4)
 		{
 			i+= 2;
 		}
 	}
-	planets[3].m_radius = baseRad;
-	planets[4].m_radius = baseRad;
-	planets[2].m_radius = baseRad*1.5;
-	planets[5].m_radius = baseRad*1.5;
-	planets[1].m_radius = baseRad*2.25;
-	planets[6].m_radius = baseRad*2.25;
-	planets[0].m_radius = baseRad*3;
-	planets[7].m_radius = baseRad*3;
 	
 	planets[3].m_velocity.Set(baseVel, 0);
 	planets[4].m_velocity.Set(baseVel, 0);
