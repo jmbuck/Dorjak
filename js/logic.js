@@ -91,7 +91,7 @@ function update()
 {
 	var timeStep = 1.0 / fps;
 	//timestep, velocityIterations, positionIterations
-	world.Step(timeStep, 8, 3);
+	world.Step(timeStep, 6, 2);
 	var keyPress;
 	var keyA = 0;
 	var keyD = 0;
@@ -112,8 +112,8 @@ function update()
 	var currTime = time.getTime();
 	if(currTime - startTime > asteroidSpawnRate) 
 	{
-		startTime = currTime;
 		generateAsteroids();
+		startTime = currTime;
 	}
 	selectOrbit(keyW, keyS);
 	movePlanets(keyA, keyD);
