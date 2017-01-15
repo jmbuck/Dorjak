@@ -223,6 +223,7 @@ function initWorld()
 		//asteroid collides with asteroid
 		if(asteroidFixtures.indexOf(fixtureA) != -1 && asteroidFixtures.indexOf(fixtureB) != -1)
 		{
+			console.log("asteroid-asteroid!");
 			var asteroid = asteroids[asteroidFixtures.indexOf(fixtureA)];
 			if(asteroid.fixtureDef.shape.GetRadius() >= 75)
 			{
@@ -249,6 +250,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && planetsFixtures.indexOf(fixtureB) != -1) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && planetsFixtures.indexOf(fixtureA) != -1)) 
 		{
+			console.log("asteroid-planet!");
 			var asteroid; 
 			if(asteroidFixtures.indexOf(fixtureA) != -1) 
 			{
@@ -273,6 +275,7 @@ function initWorld()
 		if((asteroidFixtures.indexOf(fixtureA) != -1 && fixtureB == sunObject.fixtureDef) ||
 		   (asteroidFixtures.indexOf(fixtureB) != -1 && fixtureA == sunObject.fixtureDef)) 
 		{ 
+			console.log("asteroid-sun!");
 		   self.postMessage({gameStatus : 'gameover', score: score});
 		   clearInterval(interval);
 		   self.close();
