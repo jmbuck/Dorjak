@@ -60,6 +60,10 @@ var debrisId = 1000;
 var debrisRadius = 5;
 var interval;
 var totalSteps = 0;
+var keyHeldJ = 0;
+var keyHeldL = 0;
+var keyHeldI = 0;
+var keyHeldK = 0;
 
 self.onmessage = function(e)
 {
@@ -372,21 +376,51 @@ function selectOrbit(keyW, keyS, keyI, keyK)
 {
 	if(!isMultiplayer)
 	{
-		if(keyW && currentOrbit != 3)
+		if(keyW && !keyHeldW && currentOrbit != 3)
+		{
 			currentOrbit++;
-		else if(keyS && currentOrbit != 0)
+			keyHeldW = 1;
+		}
+		else
+			keyHeldW = 0;
+		else if(keyS && !keyHeldS && currentOrbit != 0)
+		{
 			currentOrbit--;
+			keyHeldS = 1;
+		}
+		else
+			keyHeldS = 0;
 	}
 	else
 	{
-		if(keyW && currentOrbit != 2)
+		if(keyW && !keyHeldW && currentOrbit != 2)
+		{
 			currentOrbit+=2;
-		else if(keyS && currentOrbit != 0)
+			keyHeldW = 1;
+		}
+		else
+			keyHeldW = 0;
+		if(keyS && !keyHeldS && currentOrbit != 0)
+		{
 			currentOrbit-=2;
-		if(keyI && currentOrbitTwo != 3)
+			keyHeldS = 1;
+		}
+		else
+			keyHeldS = 0;
+		if(keyI && !keyHeldI && currentOrbitTwo != 3)
+		{
 			currentOrbit+=2;
-		else if(keyK && currentOrbitTwo != 1)
+			keyHeldI = 1;
+		}
+		else
+			keyHeldI = 0;
+		if(keyK && !keyHeldK && currentOrbitTwo != 1)
+		{
 			currentOrbit-=2;
+			keyHeldK = 1;
+		}
+		else
+			keyHeldK = 0;
 	}
 	for(var i = 0; i < 8; i++)
 	{
