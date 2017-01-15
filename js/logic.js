@@ -115,12 +115,12 @@ function initWorld()
 	worldAABB.upperBound.y = screenHeight;
 	world = new b2World(worldAABB, new b2Vec2(0, 0), true);
 	
-	sunObject = new sun();
+	sunObject = new Sun();
 	
 	for(var i = 2; i < 10; i += 2)
 	{
-		planets.push(new planet(i, 0));
-		planets.push(new planet(i, Math.PI));
+		planets.push(new Planet(i, 0));
+		planets.push(new Planet(i, Math.PI));
 	}
 	
 	var sunData = {x : sunObject.bodyDef.position.x, y: sunObject.bodyDef.position.y , radius : sunObject.fixtureDef.shape.GetRadius()};
@@ -144,62 +144,7 @@ function generateAsteroids() {
 	 var minVel = Math.floor(baseVel / 2);
 	 var maxVel = Math.ceil(baseVel * 2);
 	 for(var i = 0; i < numAsteroids; i++) {
-		var asteroidBd = new b2BodyDef; 
-		asteroidBd.type = b2Body.b2_dynamicBody;
-	
-		asteroidFixt = new b2FixtureDef;
-		asteroidFixt.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius));
-		asteroidFixt.density = 1;
-	
-		  
-		 var side = getRandomInt(1, 4) //generate start position
-		 switch(side) {
-			 case 1: //left
-			 asteroidBd.position.x = 0;
-			 asteroidBd.position.y = getRandomInt(0, screenHeight);
-			 break;
-			 case 2: //right
-			 asteroidBd.position.x = 0;
-			 asteroidBd.position.y = getRandomInt(screenWidth, screenHeight);
-			 break;
-			 case 3: //top
-				 var rand = getRandomInt(1, 100);
-				 if(rand <= 45) {
-					 asteroidBd.position.x = getRandomInt(0, Math.ceil(.15*screenWidth));
-					 asteroidBd.position.y = screenHeight;
-					 
-				 }
-				 else if(rand <=90) {
-					 asteroidBd.position.x = getRandomInt(Math.floor(.85*screenWidth), screenWidth);
-					 asteroidBd.position.y = screenHeight;
-				 }
-				 else {
-					 asteroidBd.position.x = getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth));
-					 asteroidBd.position.y = screenHeight;
-				 }
-			 break;
-			 case 4: //bottom
-			 default:
-				var rand = getRandomInt(1, 100);
-				if(rand <= 45) {
-					asteroidBd.position.x = getRandomInt(0, Math.ceil(.15*screenWidth));
-					asteroidBd.position.y = 0;
-				}
-				else if(rand <=90) { 
-					asteroidBd.position.x = getRandomInt(Math.floor(.85*screenWidth), screenWidth);
-					asteroidBd.position.y = 0;
-				}
-				else {
-					asteroidBd.position.x = (getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth));
-					asteroidBd.position.y = 0;
-				}
-		 }
-		//generate velocity
-		var asteroidBd.angle = calculateAngle(asteroidBd, sunObject); 
-		var velocity = getRandomInt(minVel, maxVel);
-		asteroidBd.baseVelocity = velocity;
-		asteroidBd.linearVelocity.x = velocity*Math.cos(asteroidBd.angle);
-		asteroidBd.linearVeocity.y = velocity*Math.sin(asteroidBd.angle); 
+		
 		
 		//add to world
 		asteroids.push(world.createBody(asteroidBd).createFixture(asteroidFixt); //add to array
@@ -250,7 +195,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function sun()
+function Sun()
 {
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_staticBody;
@@ -266,7 +211,7 @@ function sun()
 	this.body.CreateFixture(this.fixtureDef);
 }
 
-function planet(planetOrbit, angle)
+function Planet(planetOrbit, angle)
 {
 	this.arc = angle;
 	
@@ -287,6 +232,49 @@ function planet(planetOrbit, angle)
 	this.fixtureDef.density = 1;
 	
 	this.body.CreateFixture(this.fixtureDef);
+}
+
+function Asteroid() {
+	this.bodyDef = new b2BodyDef; 
+	this.bodyDef.type = b2Body.b2_dynamicBody;
+	  
+	var side = getRandomInt(1, 4) //generate start position
+	switch(side) {
+		case 1: //left
+			 this.bodyDef.position = new b2Vec2(0, getRandomInt(0, screenHeight));
+			 break;
+		case 2: //right
+			 this.bodyDef.position = new b2Vec2(screenWidth, getRandomInt(0, screenHeight));
+			 break;
+	    case 3: //top
+			 var rand = getRandomInt(1, 100);
+			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.15*screenWidth)), screenHeight);	 
+			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.85*screenWidth), screenWidth), screenHeight);
+			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), screenHeight);
+			 break;
+		case 4: //bottom
+		default:
+			var rand = getRandomInt(1, 100);
+			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.15*screenWidth)), 0);	 
+			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
+			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), 0);
+			 break;
+	}
+		 
+	this.fixtureDef = new b2FixtureDef;
+	this.fixtureDef.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius));
+	this.fixtureDef.density = 1;
+	
+	//generate velocity
+	this.bodyDef.angle = calculateAngle(this, sunObject); 
+	var velocity = getRandomInt(minVel, maxVel);
+	this.bodyDef.baseVelocity = velocity;
+	this.bodyDef.linearVelocity.x = velocity*Math.cos(this.bodyDef.angle);
+	this.bodyDef.linearVeocity.y = velocity*Math.sin(this.bodyDef.angle); 
+	
+	this.body = world.createBody(this.bodyDef);
+	this.body.CreateFixture(this.fixtureDef);
+	
 }
 
 
