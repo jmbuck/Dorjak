@@ -193,7 +193,21 @@ function update()
 	{
 		totalSteps++;
 	}
-	
+	for(var i = 0; i < asteroids.length; i++){
+		
+		{
+				for(var j = 1; j < asteroids.length; j++)
+				{
+					collideAsteroids(asteroids[i], asteroids[j]);
+				}
+			for(var j = 0; j < planets.length; j++)
+			{
+				collidePlanets(asteroids[i], planets[j]);
+			}
+			collideSun(asteroids[i]);
+		}
+	}
+
 	//asteroid capturing/slingshotting; also creates asteroidData to send
 	var asteroidsData = [];
 	for(var i = 0; i < asteroids.length; i++) {
@@ -232,12 +246,11 @@ function update()
 			}
 			for(var j = 0; j < planets.length && i < asteroids.length; j++)
 			{
-				if(ollidePlanets(asteroids[i], planets[j]))
+				if(collidePlanets(asteroids[i], planets[j]))
 					i = 0, j = 0;
 			}
 			if(i < asteroids.length)
 			collideSun(asteroids[i]);
-		}
 	}
 	
 	//sends gameStatus, asteroids, planets
@@ -287,6 +300,7 @@ function update()
 	}
 	destroyList = [];
 }
+
 
 function initWorld()
 {
