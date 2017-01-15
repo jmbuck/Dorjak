@@ -42,13 +42,13 @@ game.prototype.init = function()
 	
 	this.logicHandler = new Worker("./js/logic.js");
 	
-	this.logicHandler.onmessage = this.handleEvent;
+	this.logicHandler.addEventListener('message', this.handleEvent);
 	
 	this.logicHandler.postMessage({gameStatus : 'init', fps : this.fps});
 	
 	//this.renderObjects.push(new stars({count : 200}));
-	this.renderObjects.push(new sun({x : this.ctx.canvas.width / 2, y : this.ctx.canvas.height / 2, radius : 50}));
-	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 60, size : 1}));
+	//this.renderObjects.push(new sun({x : this.ctx.canvas.width / 2, y : this.ctx.canvas.height / 2, radius : 50}));
+	/*this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 60, size : 1}));
 	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 100, size : 1}));
 	this.renderObjects.push(new orbit({sun : this.renderObjects[0], radius : 160, size : 1}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : 0, size : 10}));
@@ -56,10 +56,8 @@ game.prototype.init = function()
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 160, arc : Math.PI, size : 12}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 100, arc : Math.PI, size : 15}));
 	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : 0, size : 3}));
-	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : Math.PI, size : 5}));
-	this.tick();
-	
-	console.log('Finished Loading');
+	this.renderObjects.push(new planet({sun : this.renderObjects[0], radius : 60, arc : Math.PI, size : 5}));*/
+	//this.tick();
 }
 
 game.prototype.resize = function()
@@ -84,27 +82,17 @@ game.prototype.tick = function(cnt)
 		}
 		else
 		{
-			for(var message in this.queuedMessages)
-			{
-				
-			}
-			
 			this.draw();
 		}
 	}
-	this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
+	console.log(this.renderObjects);
+	//this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 }
 
 game.prototype.draw = function()
 {
-	this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
+	//this.ctx.clearRect(0, 0, this.scaleWidth * widthToScale, this.scaleHeight * heightToScale);
 	
-	this.ctx.lineWidth = 1;
-	this.ctx.beginPath();
-    this.ctx.fillStyle = 'orange';
-    this.ctx.fill();
-    this.ctx.strokeStyle = 'black';
-    this.ctx.stroke();
 	for(var i = 0; i < this.renderObjects.length; i++)
 	{
 		this.renderObjects[i].draw(this.ctx);
@@ -115,29 +103,33 @@ game.prototype.handleEvent = function(e)
 {
 	if(e.data.gameStatus === 'init')
 	{
+		e.data.sun.x *= gameSession.scaleWidth;
+		e.data.sun.y *= gameSession.scaleHeight;
 		var sunObject = new sun(e.data.sun);
 		
-		this.gameObjects.push(sunObject);
+		gameSession.renderObjects.push(sunObject);
 		
 		for(var i = 0; i < e.data.orbits.length; i++)
 		{
 			var orbitData = e.data.orbits[i];
 			orbitData.sun = sunObject;
-			this.gameObjects.push(new orbit(orbitData));
+			orbitData.radius *= gameSession.scaleWidth;
+			gameSession.renderObjects.push(new orbit(orbitData));
 		}
 		
 		for(var i = 0; i < e.data.planets.length; i++)
 		{
 			var planetData = e.data.planets[i];
 			planetData.sun = sunObject;
-			this.gameObjects.push(new planet(planetData));
+			planetData.radius *= gameSession.scaleWidth;
+			gameSession.renderObjects.push(new planet(planetData));
 		}
 		
-		this.tick();
+		gameSession.tick();
 	}
 	else
 	{
-		this.queuedMessages.push(e.data);
+		gameSession.queuedMessages.push(e.data);
 	}
 }
 
@@ -182,16 +174,19 @@ function orbit(data)
 	this.sun = data.sun;
 	this.radius = data.radius;
 	this.size = data.size;
-	this.highlighed = true;
+	this.highlighted = false;
 }
 
 orbit.prototype.draw = function(ctx)
 {
-	ctx.beginPath();
-	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius - this.size / 5, 0, Math.PI * 2);
-	ctx.lineWidth = this.size * 10;
-	ctx.strokeStyle = 'rgba(0, 153, 153, 0.5)';
-	ctx.stroke();
+	if(this.highlighted)
+	{
+		ctx.beginPath();
+		ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius - this.size / 5, 0, Math.PI * 2);
+		ctx.lineWidth = this.size * 10;
+		ctx.strokeStyle = 'rgba(0, 153, 153, 0.5)';
+		ctx.stroke();	
+	}
 	
 	ctx.beginPath();
 	ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius, 0, Math.PI * 2);
