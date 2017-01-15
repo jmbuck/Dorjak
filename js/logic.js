@@ -90,7 +90,7 @@ self.onmessage = function(e)
 
 function update() 
 {
-	var timeStep = 1.0 / fps;
+	var timeStep = 1000 / fps;
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
 	var keyPress;
@@ -113,8 +113,8 @@ function update()
 	if(totalSteps == 60) 
 	{
 		console.log("hello");
-		console.log("hello");
 		generateAsteroids();
+		console.log("hello2");
 		totalSteps = 0;
 	} else {
 		totalSteps++;
@@ -247,7 +247,6 @@ function update()
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
-	
 	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
 }
 
