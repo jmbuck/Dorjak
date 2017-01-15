@@ -36,37 +36,56 @@ var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
-var key;
+var keys = [];
 var thrust;
-var pressed;
 var world;
+var fps;
 
 
 self.onmessage = function(e)
 {
-	if(e.data.gameStatus === "init") {
-		initWorld();
-		pressed = 0;
+	if(e.data.gameStatus == "init") 
+	{
+		fps = e.data.fps;
 		startTime = d.getTime();
-	} else if(e.data.gameStatus === "input")
-	key = e.data.key;
-	pressed = e.data.keyStatus; //1 for pressed, 0 for released
+		initWorld();
+	} 
+	else if(e.data.gameStatus == "input")
+	{
+		if(e.data.keyStatus == 0)
+		{
+			for(var i = 0; i < keys.length; i++)
+			{
+				if(keys[i] == e.data.key)
+				{
+					keyRelease(e.data.key);
+					keys.splice(i, 1);
+				}
+			}
+		}
+		else
+		{
+			keyPress(e.data.key);
+			keys.push(e.data.key);
+		}
+	}
 }
  
 
-function update() {
-	var fps = 60;
-	var timeStep = 1.0/fps;
-	var iterations = 8;
-	world.Step(timeStep, iterations);
+function update() 
+{
+	var timeStep = 1.0 / fps;
+	//timestep, velocityIterations, positionIterations
+	world.Step(timeStep, 8, 3);
 	
 	var currTime = d.getTime();
 	if(currTime - startTime > asteroidSpawnRate) {	//asteroid generation
 		startTime = currTime;
 		generateAsteroids();
 	}
-	this.timer = setTimeout( function() { update(); }  , 1000 / this.fps);
+	timer = setTimeout( function() { update(); }  , 1000 / fps);
 }
+
 function generateAsteroids() {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
 	 var minRadius = Math.floor(baseSize / 4);
