@@ -198,7 +198,6 @@ function game()
 game.prototype.init = function()
 {
 	this.score = 0;
-	this.points = [];
 	
 	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
@@ -352,6 +351,11 @@ game.prototype.handleEvent = function(e)
 				}
 			}
 		}
+		gameSession.renderObjects[e.data.orbitOne + 1].color = 'rgba(0, 153, 153, 127)';
+		if(isMultiplayer)
+		{
+			gameSession.renderObjects[e.data.orbitTwo + 1].color = 'rgba(153, 153, 0, 127)';
+		}
 		for(var i = 0; i < e.data.asteroids.length; i++)
 		{
 			e.data.asteroids[i].sun = gameSession.renderObjects[0];
@@ -492,18 +496,18 @@ function orbit(data)
 	this.sun = data.sun;
 	this.radius = data.radius;
 	this.size = data.size;
-	this.highlighted = false;
+	this.color = null;
 }
 
 orbit.prototype.draw = function(ctx)
 {
-	if(this.highlighted)
+	if(this.color != null)
 	{
 		ctx.beginPath();
 		ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius - this.size / 5, 0, Math.PI * 2);
 		ctx.lineWidth = this.size * 10;
-		ctx.strokeStyle = 'rgba(0, 153, 153, 0.5)';
-		ctx.stroke();	
+		ctx.strokeStyle = this.color;
+		ctx.stroke();
 	}
 	
 	ctx.beginPath();
