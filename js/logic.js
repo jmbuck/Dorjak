@@ -378,7 +378,7 @@ function getRandomInt(min, max) {
 
 function collideSun(asteroid)
 {
-	if(calculateDistance(sunObject, asteroid) > (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
+	if(calculateDistance(sunObject, asteroid) <= (sunObject.fixtureDef.shape.GetRadius() + asteroid.fixtureDef.shape.GetRadius()))
 	{
 		destroyList.push(asteroid.body);
 		clearInterval(interval);
