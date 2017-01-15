@@ -3,6 +3,10 @@ var gameSession = null;
 var widthToScale = 1920;
 var heightToScale = 1080;
 
+var singleplayer = [];
+var multiplayer = [];
+var isMultiplayer = false;
+
 $(function() { 
 WebFontConfig = {
   google:{ families: ['game'] },
@@ -116,9 +120,11 @@ menu.prototype.tick = function()
 	this.ctx.fillText("Dorjak", this.width / 2, 100);
 	this.ctx.strokeText("Dorjak", this.width / 2, 100);
 	
+	this.ctx.lineWidth = 1.5;
+	this.ctx.strokeText("Dorjak", this.width / 2 + Math.random() * 3, 100 + Math.random() * 3);
+	
 	this.ctx.lineWidth = 2;
 	
-	this.ctx.fillStyle = 'white';
 	this.ctx.font = '48px game';
 	this.ctx.strokeText("Let's Start", this.width / 2, 300);
 	this.ctx.strokeText("Bring a Pal", this.width / 2, 400);
@@ -130,8 +136,34 @@ menu.prototype.tick = function()
 	{
 		this.ctx.strokeText("Bring a Pal", this.width / 2 + Math.random() * 3, 400 + Math.random() * 3);
 	}
-		
-	this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
+	
+	this.ctx.fillStyle = 'orange';
+	this.ctx.textAlign = 'left';
+	this.ctx.fillText("Single Ladies", this.width / 20, 100);
+	this.ctx.strokeText("Single Ladies", this.width / 20, 100);
+	
+	this.ctx.font = "36px game";
+	
+	for(var i = 0; i < singleplayer.length; i++)
+	{
+		this.ctx.strokeText(singleplayer[i], this.width / 20, 140 + i * 40);
+	}
+	
+	this.ctx.font = '48px game';
+	this.ctx.textAlign = 'right';
+	
+	this.ctx.fillText("Tribal Hermits", this.width * 19 / 20, 100);
+	this.ctx.strokeText("Tribal Hermits", this.width * 19 / 20, 100);
+	
+	this.ctx.font = "36px game";
+	
+	for(var i = 0; i < multiplayer.length; i++)
+	{
+		this.ctx.strokeText(multiplayer[i], this.width * 19 / 20, 140 + i * 40);
+	}
+	
+	if(gameSession == this)
+		this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
 }
 
 function game()
@@ -154,6 +186,7 @@ function game()
 game.prototype.init = function()
 {
 	this.score = 0;
+	this.points = [];
 	
 	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
@@ -261,6 +294,24 @@ game.prototype.draw = function()
 	{
 		this.renderObjects[i].draw(this.ctx);
 	}
+	
+	var time = Date.now();
+	
+	this.ctx.beginPath();
+	for(var i = 0; i < this.points; i++)
+	{
+		if(this.points[i].time - time < 0)
+		{
+			this.points.splace(i, 1);
+			i--;
+		}
+		else
+		{
+			this.ctx.fillStyle = this.points[i].rgba;
+			this.ctx.rect(this.points[i].x, this.points[i].y, this.points[i].size, this.points[i].size);
+			this.ctx.fill();
+		}
+	}
 }
 
 game.prototype.handleEvent = function(e)
@@ -329,6 +380,36 @@ game.prototype.handleEvent = function(e)
 	{
 		gameSession.paused = 2;
 		gameSession.score = e.data.score;
+		if(isMultiplayer)
+		{
+			for(var i = 0; i < multiplayer.length; i++)
+			{
+				if(multiplayer[i] < e.data.score)
+				{
+					multiplayer.splice(i, 0, e.data.score);
+					break;
+				}
+			}
+			if(multiplayer.length > 15)
+			{
+				multiplayer.splice(15, 1);
+			}
+		}
+		else
+		{
+			for(var i = 0; i < multiplayer.length; i++)
+			{
+				if(singleplayer[i] < e.data.score)
+				{
+					singleplayer.splice(i, 0, e.data.score);
+					break;
+				}
+			}
+			if(singleplayer.length > 15)
+			{
+				singleplayer.splice(15, 1);
+			}
+		}
 	}
 	gameSession.tick();
 }
@@ -474,4 +555,6 @@ asteroid.prototype.draw = function(ctx)
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 2;
 	ctx.stroke();
+	var color = "rgba(" (Math.random() * 255) + "," (Math.random() * 255) + "," + (Math.random() * 255) + ", 255)";
+	gameSession.points.push({x : this.x, y : this.y, size : Math.random() * 2 + .5, rgba = color});
 }
