@@ -93,6 +93,7 @@ function initWorld()
 	for(var i = 1; i < 11; i++)
 	{
 		var planetCircleDef = new b2CircleDef();
+		var info = new b2Vec3();
 		switch(i) {
 			case 1: planetCircleDef.radius = baseRad*3;
 			x = 
@@ -110,54 +111,69 @@ function initWorld()
 			case 9:planetCircleDef.radius = baseRad*2.25;
 			break;
 			case 10:planetCircleDef.radius = baseRad*3;
-			break;
 			default:
 		}
+		info.rad = planetBody.radius;
 		var planetB = new b2BodyDef();
 		planetB.addShape(planetCircleDef);
 		planetB.position.Set(screenWidth/2, screenHeight*i/11);
+		planetB.distanceFromSun = Math.abs(planetB.position.y - sun.position.y);
+		switch(i) {
+			case 1:
+				planetB.angleFromSun = Math.PI/2;			
+				planetB.baseVelocity = baseVel/2;
+				planetB.linearVelocity.Set(baseVel/2, 0);
+			break;
+			case 2:
+				planetB.angleFromSun = Math.PI/2;
+				planetB.baseVelocity = baseVel/1.7;
+				planetB.linearVelocity.Set(baseVel/1.7, 0);
+			break;
+			case 3:
+				planetB.angleFromSun = Math.PI/2;
+				planetB.baseVelocity = -baseVel/1.4;
+				planetB.linearVelocity.Set(-baseVel/1.4, 0);
+			break;
+			case 4:
+				planetB.angleFromSun = Math.PI/2;
+				planetB.baseVelocity = baseVel;
+				planetB.linearVelocity.Set(baseVel, 0);
+			break;
+			case 7:
+				planetB.angleFromSun = Math.PI*3/2;
+				planetB.baseVelocity = baseVel;
+				planetB.linearVelocity.Set(baseVel, 0);
+			break;
+			case 8:
+				planetB.angleFromSun = Math.PI*3/2;
+				planetB.baseVelocity = -baseVel/1.4;
+				planetB.linearVelocity.Set(-baseVel/1.4, 0);
+			break;
+			case 9:
+				planetB.angleFromSun = Math.PI*3/2;
+				planetB.baseVelocity = baseVel/1.7;
+				planetB.linearVelocity.Set(baseVel/1.7, 0);
+			break;
+			case 10:
+				planetB.angleFromSun = Math.PI*3/2;
+				planetB.baseVelocity = baseVel/2;
+				planetB.linearVelocity.Set(baseVel/2, 0);
+			default:
+		}
 		var planetBody = world.CreateBody(planetB);
-		planets.push(planetBody);
+		info.angle = planetB.angleFromSun;
+		info.dist = planetB.distanceFromSun;
+		planets.push(planetBody);	
+		data.push(info);
 		if(i == 4)
 		{
 			i+= 2;
 		}
 	}
 	
-	planets[3].m_velocity.Set(baseVel, 0);
-	planets[4].m_velocity.Set(baseVel, 0);
-	planets[2].m_velocity.Set(-baseVel/1.4, 0);
-	planets[5].m_velocity.Set(-baseVel/1.4, 0);
-	planets[1].m_velocity.Set(baseVel/1.7, 0);
-	planets[6].m_velocity.Set(baseVel/1.7, 0);
-	planets[0].m_velocity.Set(baseVel/2, 0);
-	planets[7].m_velocity.Set(baseVel/2, 0);
-	
-	planets[3].m_baseVelocity = baseVel;
-	planets[4].m_baseVelocity = baseVel;
-	planets[2].m_baseVelocity = -baseVel/1.4;
-	planets[5].m_baseVelocity = -baseVel/1.4;
-	planets[1].m_baseVelocity = baseVel/1.7;
-	planets[6].m_baseVelocity = baseVel/1.7;
-	planets[0].m_baseVelocity = baseVel/2;
-	planets[7].m_baseVelocity = baseVel/2;
-	
 	for(var i = 0; i < 8; i++)
 	{
-		planets[i].radiusFromSun = Math.sqrt(Math.pow((planet.m_position.x - sun.m_position.x), 2) + Math.pow((planet.m_position.y - sun.m_position.y), 2));
-		if(i <= 3)
-		{			
-			planet.angleToSun = 90;
-		}
-		else
-		{
-			planet.angleToSun = 270;
-		}
-		var info = new b2Vec3();
-		info.rad = planets[i].m_radius;
-		info.angle = planets[i].angleToSun;
-		info.dist = planets[i].radiusFromSun;
-		data.push(info);
+		
 	}
 	
 	postMessage({gameStatus : 'init', sun : {x : sun.m_position.x, y: sun.m_position.y , radius : sun.m_radius}, planets : data});
