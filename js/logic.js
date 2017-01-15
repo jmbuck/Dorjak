@@ -35,8 +35,10 @@ var baseRadius = 50;
 var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 100;
+var currentPlanet = 0;
 var keys = [];
 var thrust;
+var thrustCap = 2;
 var world;
 var fps;
 var sunRadius = 50;
@@ -76,6 +78,22 @@ function update()
 	var timeStep = 1.0 / fps;
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 8, 3);
+	var keyPress;
+	var keyA = 0;
+	var keyD = 0;
+	var keyW = 0;
+	var keyS = 0;
+	for(var i = 0; i < keys.length; i++)
+	{
+		if(keys[i] === 'a')
+			keyA = 1;
+		if(keys[i] === 'd')
+			keyD = 1;
+		if(keys[i] === 'w')
+			keyW = 1;
+		if(keys[i] === 's')
+			keyS = 1;
+	}
 	
 	var currTime = d.getTime();
 	if(currTime - startTime > asteroidSpawnRate) 
@@ -98,7 +116,7 @@ function initWorld()
 	
 	sunObject = new sun();
 	
-	for(var i = 0; i < 8; i += 2)
+	for(var i = 2; i < 10; i += 2)
 	{
 		planets.push(new planet(i, 0));
 		planets.push(new planet(i, Math.PI));
@@ -152,23 +170,31 @@ function generateAsteroids() {
 	
 }
 
-function movePlanets()
+function movePlanets(keyA, keyD)
 {
 	for(var planet in planets)
 	{
-		/*if(-selected- && pressed)
+		if(planet.selected && (keyA || keyD) && keyA != keyD)
 		{
-			if(-speed-)
+			if(keyD)
+			{
 				thrust += 0.2;
-			else if(-slow-)
+				if(thrust < -thrustCap)
+					thrust = -thrustCap;
+			}
+			else if(keyA)
+			{
 				thrust -= 0.2;
+				if(thrust < -thrustCap)
+					thrust = -thrustCap;
+			}	
 		}
 		else if(thrust < 0)
 			thrust += 0.1;
 		else if(thrust > 0)
 			thrust -= 0.1;
-		var angVelocity = (planet.m_baseVelocity + thrust*10)/planet.radiusFromSun;
-		planet.angleToSun = planet.angleToSun + angVelocity;*/
+		var angularVelocity = (planet.baseAngularVelocity + thrust*10);
+		planet.angle = planet.angle + angularVelocity;	
 	}
 }
 
@@ -177,8 +203,8 @@ function movePlanets()
 
 
 function calculateDistance(a, b) { //returns distance between object a and object b
-	return Math.sqrt((a.m_position.x - b.m_position.x)*(a.m_position.x - b.m_position.x)+
-					  (a.m_position.y - b.m_position.y)*(a.m_position.y - b.m_position.y));
+	return Math.sqrt((a.position.x - b.position.x)*(a.position.x - b.position.x)+
+					  (a.position.y - b.position.y)*(a.position.y - b.position.y));
 }
 
 function calculateAngle(current, target) {
@@ -211,10 +237,15 @@ function planet(planetOrbit, angle)
 {
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_kinematicBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, i)) * Math.sin(angle))
-	this.bodyDef.angle - 0;
+	this.bodyDef.position = new b2Vec2(screenWidth / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.cos(angle), screenHeight / 2 + (sunRadius + baseRadius * Math.pow(1.5, planetOrbit)) * Math.sin(angle))
+	this.bodyDef.angle = angle;
+	this.bodyDef.radius = (planetOrbit*baseRadius)/4;
 	
 	this.body = world.CreateBody(this.bodyDef);
+	
+	this.selected = 0;
+	this.distance = calculateDistance(this, sun);
+	this.baseAngularVelocity = (((10-planetOrbit)*baseVel)/4)/this.distance;
 	
 	this.fixtureDef = new b2FixtureDef;
 	this.fixtureDef.shape = new b2CircleShape((Math.random() / 2 + .75) * Math.pow(2, i));
