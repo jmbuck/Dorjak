@@ -157,16 +157,28 @@ game.prototype.tick = function(cnt)
 			console.log("this");
 			for(var object in this.renderObjects)
 			{
-				if(object instanceof planet)
+				var found = false;
+				for(var i = 0; i < data.planets.length; i++)
 				{
-					for(var i = 0; i < data.planets.length; i++)
+					if(data.planets[i].id == object.id)
 					{
-						if(data.planets[i].id == object.id)
+						if(object instanceof planet)
 						{
-							object.x = data.planets[i].x;
-							object.y = data.planets[i].y;
+							object.arc = data.arc;
 						}
+						else if(object instanceof asteroid)
+						{
+							object.x = data.x;
+							object.y = data.y;
+						}
+						found = true;
+						break;
 					}
+				}
+				if(!found)
+				{
+					data.sun = this.renderObjects[0];
+					this.renderObjects.push(new asteroid(data));
 				}
 			}
 		}
@@ -335,6 +347,7 @@ game.prototype.keyRelease = function(e)
 
 function sun(data)
 {
+	this.id = -1;
 	this.x = data.x;
 	this.y = data.y;
 	this.radius = data.radius;
@@ -353,6 +366,7 @@ sun.prototype.draw = function(ctx)
 
 function orbit(data)
 {
+	this.id = data.id;
 	this.sun = data.sun;
 	this.radius = data.radius;
 	this.size = data.size;
