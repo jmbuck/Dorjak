@@ -159,7 +159,14 @@ function update()
 		for(p in planets) {
 			var dist = calculateDistance(a, p); 
 			if(dist - p.planet.fixtureDef.shape.GetRadius() <= 10) {
-				
+				var xDiff = a.asteroid.bodyDef.position.x - p.planet.bodyDef.position.x;
+				var yDiff = a.asteroid.bodyDef.position.y - p.planet.bodyDef.position.y;
+				//y
+				if(aY < 0) a.asteroid.bodyDef.linearVelocity.y += 3;
+				else a.asteroid.bodyDef.linearVelocity.y -= 3;
+				//x
+				if(aX < 0) a.asteroid.bodyDef.linearVelocity.x += 3;
+				else a.asteroid.bodyDef.linearVelocity.x -= 3;
 			}
 		}
 	}
