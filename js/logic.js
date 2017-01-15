@@ -39,12 +39,11 @@ var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 4;
 var currentOrbit = 0;
-var currentOrbitTwo = 0;
-var keys = [];
+var currentOrbitTwo = 1;
+var playerOneHold;
+var playerTwoHold;
 var isMultiplayer;
-var thrust;
-var thrustTwo;
-var thrustCap = 2;
+var thrustCap = 10;
 var world;
 var fps;
 var sunRadius = 30;
@@ -78,31 +77,116 @@ self.onmessage = function(e)
 	{
 		if(e.data.keyStatus == 0)
 		{
-			for(var i = 0; i < keys.length; i++)
-			{
-				if(keys[i] == e.data.key)
-				{
-					keyRelease(e.data.key);
-					keys.splice(i, 1);
-				}
-			}
+			keyRelease(e.data.key);
 		}
 		else
 		{
 			keyPress(e.data.key);
-			keys.push(e.data.key);
 		}
 	}
 }
  
 function keyPress(key)
 {
+	var keyA = 0, keyD = 0, keyJ = 0, keyL = 0;
+	if(key == 'w' && !playerOneHold)
+	{
+		playerOneHold = true;
+		currentOrbit = (currentOrbit + (isMultiplayer ? 2 : 1)) % 4;
+	}
+	else if(key == 's' && !playerOneHold)
+	{
+		playerOneHold = true;
+		currentOrbit = (currentOrbit - (isMultiplayer ? 2 : 1)) % 4;
+		if(currentOrbit < 0)
+			currentOrbit = isMultiplayer ? 2 : 3;
+	}
+	else if(key == 'a')
+	{
+		keyA = 1;
+	}
+	else if(key == 'd')
+	{
+		keyD = 1;
+	}
+	else if(key == 'i')
+	{
+		playerTwoHold = true;
+		currentOrbitTwo = (currentOrbitTwo + 2) % 4;
+	}
+	else if(key == 'k')
+	{
+		playerTwoHold = true;
+		currentOrbitTwo = (currentOrbitTwo - 2) % 4;
+		if(currentOrbitTwo < 0)
+			currentOrbitTwo = 3;
+	}
+	else if(key == 'j')
+	{
+		keyJ = 1;
+	}
+	else if(key == 'l')
+	{
+		keyL = 1;
+	}
 	
+	movePlanets(keyA, keyD, keyJ, keyL);
 }
 
 function keyRelease(key)
 {
-	
+	if(key == 'w')
+	{
+		playerOneHold = false;
+	}
+	else if(key == 's')
+	{
+		playerOneHold = false;
+	}
+	else if(key == 'j')
+	{
+		playerTwoHold = false;
+	}
+	else if(key == 'l')
+	{
+		playerTwoHold = false;
+	}
+}
+
+function movePlanets(keyA, keyD, keyJ, keyL)
+{
+	var multiplier = 1;
+	for(var i = 0; i < planets.length; i++)
+	{
+		if(planets[i].baseAngularVelocity > 0)
+		{
+			multiplier = 1;
+		}
+		else
+		{
+			multiplier = -1;
+		}
+		if(currentOrbit == Math.floor(i / 2))
+		{
+			if((keyA || keyD) && keyA != keyD)
+			{
+				if(keyD)
+					planets[i].angularVelocity += .05;
+				else
+					planets[i].angularVelocity -= .2;
+			}
+		}
+		if(currentOrbitTwo = Math.floor(i / 2) && isMultiplayer)
+		{
+			if((keyJ || keyL) && keyJ != keyL)
+			{
+				if(keyL)
+					planets[i].angularVelocity += .05;
+				else
+					planets[i].angularVelocity -= .2;
+			}
+		}
+	}
 }
 
 function update() 
@@ -110,40 +194,6 @@ function update()
 	var timeStep = 1000 / fps;
 	//timestep, velocityIterations, positionIterations
 	world.Step(timeStep, 6, 2);
-	var keyA = 0;
-	var keyD = 0;
-	var keyW = 0;
-	var keyS = 0;
-	var keyJ = 0;
-	var keyL = 0;
-	var keyI = 0;
-	var keyK = 0;
-	for(var i = 0; i < keys.length; i++)
-	{
-		if(keys[i] == 'a')
-			keyA = 1;
-		else if(keys[i] == 'd')
-			keyD = 1;
-		else if(keys[i] == 'w')
-			keyW = 1;
-		else if(keys[i] == 's')
-			keyS = 1;
-	}
-	if(isMultiplayer)
-	{
-		orbitTwo = 1;
-		for(var i = 0; i < keys.length; i++)
-		{
-			if(keys[i] == 'j')
-				keyJ = 1;
-			else if(keys[i] == 'l')
-				keyL = 1;
-			else if(keys[i] == 'i')
-				keyI = 1;
-			else if(keys[i] == 'k')
-				keyK = 1;
-		}
-	}
 	
 	if(totalSteps == 60) 
 	{
@@ -154,9 +204,6 @@ function update()
 	{
 		totalSteps++;
 	}
-	
-	selectOrbit(keyW, keyS, keyI, keyK);
-	movePlanets(keyA, keyD, keyJ, keyL);
 	
 	var destroyData = [];
 	
@@ -199,8 +246,11 @@ function update()
 	
 	//sends gameStatus, asteroids, planets
 	var planetsData = [];
-	for(var i = 0; i < planets.length; i++) {
-		planets[i].arc += planets[i].baseAngularVelocity;
+	for(var i = 0; i < planets.length; i++) 
+	{
+		planets[i].arc += planets[i].baseAngularVelocity + planets[i].angularVelocity;
+		planets[i].angularVelocity /= 1.1;
+		planets[i].arc %= 2 * Math.PI;
 		planetsData.push({arc : planets[i].arc, id: planets[i].id});
 	}
 	
@@ -210,7 +260,7 @@ function update()
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
 	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
-while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
+	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
 }
 
 function initWorld()
@@ -378,123 +428,6 @@ function generateAsteroids()
 	
 }
 
-function selectOrbit(keyW, keyS, keyI, keyK)
-{
-	if(!isMultiplayer)
-	{
-		if(keyW && !keyHeldW && currentOrbit != 3)
-		{
-			currentOrbit++;
-			keyHeldW = 1;
-		}
-		else
-			keyHeldW = 0;
-		if(keyS && !keyHeldS && currentOrbit != 0)
-		{
-			currentOrbit--;
-			keyHeldS = 1;
-		}
-		else
-			keyHeldS = 0;
-	}
-	else
-	{
-		if(keyW && !keyHeldW && currentOrbit != 2)
-		{
-			currentOrbit+=2;
-			keyHeldW = 1;
-		}
-		else
-			keyHeldW = 0;
-		if(keyS && !keyHeldS && currentOrbit != 0)
-		{
-			currentOrbit-=2;
-			keyHeldS = 1;
-		}
-		else
-			keyHeldS = 0;
-		if(keyI && !keyHeldI && currentOrbitTwo != 3)
-		{
-			currentOrbit+=2;
-			keyHeldI = 1;
-		}
-		else
-			keyHeldI = 0;
-		if(keyK && !keyHeldK && currentOrbitTwo != 1)
-		{
-			currentOrbit-=2;
-			keyHeldK = 1;
-		}
-		else
-			keyHeldK = 0;
-	}
-	for(var i = 0; i < 8; i++)
-	{
-		if(Math.floor(i/2) == currentOrbit || (isMultiplayer && Math.floor(i/2) == currentOrbitTwo))
-			planets[i].selected = 1;
-		else
-			planets[i].selected = 0;
-	}
-}
-
-function movePlanets(keyA, keyD, keyJ, keyL)
-{
-	for(var i = 0; i < planets.length; i++)
-	{
-		if(planets[i].selected && (keyA || keyD) && keyA != keyD)
-		{
-			if(keyD)
-			{
-				thrust += 0.2;
-				if(thrust < -thrustCap)
-					thrust = -thrustCap;
-			}
-			else if(keyA)
-			{
-				thrust -= 0.2;
-				if(thrust < -thrustCap)
-					thrust = -thrustCap;
-			}	
-		}
-		else if(thrust < 0)
-			thrust += 0.1;
-		else if(thrust > 0)
-			thrust -= 0.1;
-		var angularVelocity = (planets[i].baseAngularVelocity + thrust*0.5);
-		planets[i].angle = planets[i].angle + angularVelocity;
-		if(isMultiplayer)
-		{
-			i++;
-		}
-	}
-	for(var i = 1; i < planets.length && isMultiplayer; i+=2)
-	{
-		if(planets[i].selected && (keyJ || keyL) && keyJ != keyL)
-		{
-			if(keyL)
-			{
-				thrustTwo += 0.2;
-				if(thrustTwo < -thrustCap)
-					thrustTwo = -thrustCap;
-			}
-			else if(keyJ)
-			{
-				thrustTwo -= 0.2;
-				if(thrustTwo < -thrustCap)
-					thrustTwo = -thrustCap;
-			}	
-		}
-		else if(thrustTwo < 0)
-			thrust += 0.1;
-		else if(thrustTwo > 0)
-			thrust -= 0.1;
-		var angularVelocity = (planets[i].baseAngularVelocity + thrustTwo*0.5);
-		planets[i].angle = planets[i].angle + angularVelocity;
-		
-	}
-	
-}
-
 function calculateDistance(a, b) { //returns distance between object a and object b
 	return Math.sqrt((a.bodyDef.position.x - b.bodyDef.position.x)*(a.bodyDef.position.x - b.bodyDef.position.x)+
 					  (a.bodyDef.position.y - b.bodyDef.position.y)*(a.bodyDef.position.y - b.bodyDef.position.y));
@@ -534,6 +467,7 @@ function Planet(planetOrbit, angle, id)
 	this.selected = 0;
 	this.distance = (planetOrbit * baseDistance + Math.pow(1.25, 3 * planetOrbit) - (planetOrbit > 6 ? 20 : 0) + Math.pow(1.2, 3 * Math.min(planetOrbit, 5)));
 	this.baseAngularVelocity = (planetOrbit == 3 || planetOrbit == 4 ? -1 : 1) * (((10 - planetOrbit)) / 4 ) / this.distance;
+	this.angularVelocity = 0;
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));
