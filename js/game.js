@@ -418,7 +418,7 @@ game.prototype.keyPress = function(e)
 {
 	if(gameSession.paused === 2)
 	{
-		if(e.which == 32 || e.which == 27)
+		if(e.which == 32)
 		{
 			gameSession.logicHandler.terminate();
 			
@@ -426,7 +426,7 @@ game.prototype.keyPress = function(e)
 			
 			gameSession.init();
 		}
-		else
+		else if(e.which == 27)
 		{
 			gameSession.logicHandler.terminate();
 			
