@@ -59,10 +59,6 @@ var debrisId = 1000;
 var debrisRadius = 5;
 var interval;
 var totalSteps = 0;
-var keyHeldJ = 0;
-var keyHeldL = 0;
-var keyHeldI = 0;
-var keyHeldK = 0;
 
 self.onmessage = function(e)
 {
@@ -251,6 +247,7 @@ function update()
 		planets[i].arc += planets[i].baseAngularVelocity + planets[i].angularVelocity;
 		planets[i].angularVelocity /= 1.1;
 		planets[i].arc %= 2 * Math.PI;
+		planets[i].bodyDef.position = new b2Vec2(planets[i].distance * Math.cos(planets[i].arc), planets[i].distance * Math.sin(planets[i].arc))
 		planetsData.push({arc : planets[i].arc, id: planets[i].id});
 	}
 	
@@ -418,7 +415,7 @@ function generateAsteroids()
 {
 	 var numAsteroids =  getRandomInt(0, 3); //generates between 0-3 (inclusive)
 
-	 for(var i = 0; i < numAsteroids; i++) {
+	 for(var i = 0; i < 1; i++) {
 		//add to world
 		var asteroid = new Asteroid();
 		asteroids.push(asteroid); //add to array
@@ -470,7 +467,7 @@ function Planet(planetOrbit, angle, id)
 	this.angularVelocity = 0;
 	
 	this.bodyDef = new b2BodyDef;
-	this.bodyDef.position = new b2Vec2(this.distance*Math.cos(angle), this.distance*Math.sin(angle));
+	this.bodyDef.position = new b2Vec2(this.distance * Math.cos(this.arc), this.distance * Math.sin(this.arc));
 	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.angle = 0;
 	this.bodyDef.userData = this;
@@ -504,16 +501,16 @@ function Asteroid() {
 			 break;
 	    case 3: //top
 			 var rand = getRandomInt(1, 100);
-			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.15*screenWidth)), screenHeight);	 
-			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.85*screenWidth), screenWidth), screenHeight);
-			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), screenHeight);
+			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.05*screenWidth)), screenHeight);	 
+			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.95*screenWidth), screenWidth), screenHeight);
+			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.05*screenWidth), Math.ceil(.95*screenWidth)), screenHeight);
 			 break;
 		case 4: //bottom
 		default:
 			var rand = getRandomInt(1, 100);
-			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.15*screenWidth)), 0);	 
-			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
-			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), 0);
+			 if(rand <= 45)	this.bodyDef.position = new b2Vec2(getRandomInt(0, Math.ceil(.05*screenWidth)), 0);	 
+			 else if(rand <=90)  this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.95*screenWidth), screenWidth), 0);
+			 else   this.bodyDef.position = new b2Vec2(getRandomInt(Math.floor(.05*screenWidth), Math.ceil(.95*screenWidth)), 0);
 			 break;
 	}
 		 
@@ -528,18 +525,20 @@ function Asteroid() {
 	var triangleHeight = this.bodyDef.position.y - sunObject.bodyDef.position.y;
 	var triangleBase = this.bodyDef.position.x - sunObject.bodyDef.position.x;
 	var ratio = triangleHeight/triangleBase;
-	var velocity = getRandomInt(2, 5);
-	this.bodyDef.baseVelocity = velocity;
+	var velocity = getRandomInt(1, 3);
+	//this.bodyDef.baseVelocity = velocity;
 	if(triangleBase < 0) 
 		this.bodyDef.linearVelocity.x =  velocity;
 	else 
 		this.bodyDef.linearVelocity.x =  -velocity;
 	
 	if (triangleHeight < 0)
-		this.bodyDef.linearVelocity.y = ratio*velocity;
+		this.bodyDef.linearVelocity.y = ratio * velocity;
 	else
-		this.bodyDef.linearVelocity.y = -ratio*velocity;
+		this.bodyDef.linearVelocity.y = -ratio * velocity;
 	
+	console.log(this.bodyDef.position.x + " " + this.bodyDef.position.y + " " + triangleHeight + " " + triangleBase + " " + ratio);
+	console.log("--" + this.bodyDef.linearVelocity.x + " " + this.bodyDef.linearVelocity.y);
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixtureDef);
