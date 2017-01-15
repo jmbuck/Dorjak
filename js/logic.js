@@ -203,9 +203,9 @@ function calculateDistance(a, b) { //returns distance between object a and objec
 					  (a.m_position.y - b.m_position.y)*(a.m_position.y - b.m_position.y));
 }
 
-function calculateAngle(current, target) {
-	var triangleHeight = current.m_position.y - target.m_position.y;
-	var triangleBase = current.m_position.x - target.m_position.x;
+function calculateAngle(current, target) { //returns angle to sun in radians
+	var triangleHeight = current.position.y - target.bodyDef.position.y;
+	var triangleBase = current.position.x - target.bodyDef.position.x;
 	return Math.atan(triangleBase/triangleHeight);
 }
 
