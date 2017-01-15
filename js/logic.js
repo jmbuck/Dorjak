@@ -60,8 +60,8 @@ var debrisId = 1000;
 var debrisRadius = 5;
 var interval;
 var totalSteps = 0;
-var keyHeldJ = 0;
-var keyHeldL = 0;
+var keyHeldW = 0;
+var keyHeldS = 0;
 var keyHeldI = 0;
 var keyHeldK = 0;
 
@@ -512,7 +512,7 @@ function Sun()
 {
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_staticBody;
-	this.bodyDef.position = new b2Vec2(screenWidth / 2, screenHeight / 2);
+	this.bodyDef.position = new b2Vec2(screenWidth/2, screenHeight/2);
 	this.bodyDef.angle = 0;
 	this.bodyDef.userData = this;
 	
@@ -589,20 +589,21 @@ function Asteroid() {
 	this.bodyDef.angle = 0;
 	var angleToSun = calculateAngle(this, sunObject);
 	
-	var triangleHeight = this.bodyDef.position.y - sunObject.bodyDef.position.y;
-	var triangleBase = this.bodyDef.position.x - sunObject.bodyDef.position.x;
-	var ratio = triangleHeight/triangleBase;
+	var triangleHeight = screenHeight/3 - this.bodyDef.position.y;
+	var triangleBase = screenWidth/3 - this.bodyDef.position.x;
+	var ratioY = triangleHeight/calculateDistance(this, sunObject);
+	var ratioX = triangleBase/calculateDistance(this, sunObject);
 	var velocity = getRandomInt(2, 5);
 	this.bodyDef.baseVelocity = velocity;
-	if(triangleBase < 0) 
-		this.bodyDef.linearVelocity.x =  velocity;
+	if(triangleBase > 0) 
+		this.bodyDef.linearVelocity.x =  ratioX*velocity;
 	else 
-		this.bodyDef.linearVelocity.x =  -velocity;
+		this.bodyDef.linearVelocity.x =  ratioX*velocity;
 	
-	if (triangleHeight < 0)
-		this.bodyDef.linearVelocity.y = ratio*velocity;
+	if (triangleHeight > 0)
+		this.bodyDef.linearVelocity.y = ratioY*velocity;
 	else
-		this.bodyDef.linearVelocity.y = -ratio*velocity;
+		this.bodyDef.linearVelocity.y = ratioY*velocity;
 	
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
