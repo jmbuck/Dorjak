@@ -91,6 +91,15 @@ self.onmessage = function(e)
 	}
 }
  
+function keyPress(key)
+{
+	
+}
+
+function keyRelease(key)
+{
+	
+}
 
 function update() 
 {
@@ -149,7 +158,6 @@ function update()
 	
 	for(var i = 0; i < destroyList.length; i++)
 	{
-		console.log(destroyList[i]);
 		destroyData.push({id : destroyList[i].id});
 	}
 	
@@ -179,6 +187,8 @@ function update()
 			destroyData.push({id: asteroids[i].id});
 			asteroids.splice(i, 1);
 			asteroidFixtures.splice(i, 1);
+			i--;
+			continue;
 		}
 		asteroidsData.push({sun : null, x: asteroids[i].bodyDef.position.x, y: asteroids[i].bodyDef.position.y, radius: asteroids[i].fixtureDef.shape.GetRadius(), id: asteroids[i].id});
 	}

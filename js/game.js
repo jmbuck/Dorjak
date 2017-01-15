@@ -98,8 +98,20 @@ menu.prototype.mouseClick = function(e)
 {
 	if(gameSession.timeElapsed > 0)
 	{
-		gameSession = new game();
+		isMultiplayer = false;
+		gameSession = new game;
 	
+		$(window).unbind("mousemove");
+		$(window).unbind("click");
+		gameSession.init();
+	}
+	else if(gameSession.timeElapsed1 > 0)
+	{
+		isMultiplayer = true;
+		gameSession = new game;
+		
+		$(window).unbind("mousemove");
+		$(window).unbind("click");
 		gameSession.init();
 	}
 }
@@ -186,7 +198,6 @@ function game()
 game.prototype.init = function()
 {
 	this.score = 0;
-	this.points = [];
 	
 	this.ctx = $('#canvas')[0].getContext('2d');
 	this.canvas = this.ctx.canvas;
@@ -231,7 +242,7 @@ game.prototype.tick = function(cnt)
 	
 	if(this.renderObjects.length > 0)
 	{
-		if(this.paused === 2)
+		if(this.paused === 0)
 		{
 			var sunObject = this.renderObjects[0];
 			
@@ -259,9 +270,6 @@ game.prototype.tick = function(cnt)
 				
 				this.ctx.lineWidth = 1;
 				this.ctx.fillStyle = this.ctx.strokeStyle = 'black';
-				for(var j = 0; j < 5; j++)
-				{
-					if(this.ticks - 60 - j * 2 > 0) {
 				for(var i = 0; i < 2 * Math.PI; i += Math.PI / 10)
 				{
 					var cos = Math.cos(i) * (.5 - (this.ticks - 60 - j * 2) * 2);
@@ -271,13 +279,11 @@ game.prototype.tick = function(cnt)
 					this.ctx.lineTo(this.width / 2 + 35 * cos, this.height / 2 + sin * 35);
 					this.ctx.fill();
 					this.ctx.stroke();
-				}}
 				}
 				this.ctx.font = "48px game";
 				this.ctx.textAlign = 'center';
 				this.ctx.fillText(this.score, this.width / 2, this.height / 2 + 16);
 			}
-			this.timer = setTimeout( function() { gameSession.tick(); }  , 1000 / this.fps);
 		}
 		else
 		{
@@ -345,6 +351,11 @@ game.prototype.handleEvent = function(e)
 				}
 			}
 		}
+		gameSession.renderObjects[e.data.orbitOne + 1].color = 'rgba(0, 153, 153, 127)';
+		if(isMultiplayer)
+		{
+			gameSession.renderObjects[e.data.orbitTwo + 1].color = 'rgba(153, 153, 0, 127)';
+		}
 		for(var i = 0; i < e.data.asteroids.length; i++)
 		{
 			e.data.asteroids[i].sun = gameSession.renderObjects[0];
@@ -406,9 +417,9 @@ game.prototype.startInputHandlers = function()
 
 game.prototype.keyPress = function(e)
 {
-	if(gameSession.paused === 0)
+	if(gameSession.paused === 2)
 	{
-		if(e.key == 32)
+		if(e.which == 32)
 		{
 			gameSession = new menu;
 			
@@ -430,9 +441,20 @@ game.prototype.keyPress = function(e)
 			gameSession.init();
 		}
 	}
-	else
+	else if ((gameSession instanceof game))
 	{
-		gameSession.logicHandler.postMessage({gameStatus : 'input', key : e, keyStatus : 1});	
+		if(e.which == 27)
+		{
+			gameSession.logicHandler.terminate();
+			
+			gameSession = new menu;
+			
+			gameSession.init();
+		}
+		else
+		{
+			gameSession.logicHandler.postMessage({gameStatus : 'input', key : e.key, keyStatus : 1});	
+		}
 	}
 	return false;
 }
@@ -474,18 +496,18 @@ function orbit(data)
 	this.sun = data.sun;
 	this.radius = data.radius;
 	this.size = data.size;
-	this.highlighted = false;
+	this.color = null;
 }
 
 orbit.prototype.draw = function(ctx)
 {
-	if(this.highlighted)
+	if(this.color != null)
 	{
 		ctx.beginPath();
 		ctx.arc(this.sun.x, this.sun.y, this.sun.radius + this.radius - this.size / 5, 0, Math.PI * 2);
 		ctx.lineWidth = this.size * 10;
-		ctx.strokeStyle = 'rgba(0, 153, 153, 0.5)';
-		ctx.stroke();	
+		ctx.strokeStyle = this.color;
+		ctx.stroke();
 	}
 	
 	ctx.beginPath();
