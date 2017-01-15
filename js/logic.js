@@ -39,9 +39,11 @@ var screenWidth = 1920;
 var screenHeight = 1080;
 var baseVel = 4;
 var currentOrbit = 0;
+var currentOrbitTwo = 0;
 var keys = [];
 var isMultiplayer;
 var thrust;
+var thrustTwo;
 var thrustCap = 2;
 var world;
 var fps;
@@ -107,24 +109,25 @@ function update()
 	{
 		if(keys[i] == 'a')
 			keyA = 1;
-		if(keys[i] == 'd')
+		else if(keys[i] == 'd')
 			keyD = 1;
-		if(keys[i] == 'w')
+		else if(keys[i] == 'w')
 			keyW = 1;
-		if(keys[i] == 's')
+		else if(keys[i] == 's')
 			keyS = 1;
 	}
 	if(isMultiplayer)
 	{
+		orbitTwo = 1;
 		for(var i = 0; i < keys.length; i++)
 		{
 			if(keys[i] == 'j')
 				keyJ = 1;
-			if(keys[i] == 'l')
+			else if(keys[i] == 'l')
 				keyL = 1;
-			if(keys[i] == 'i')
+			else if(keys[i] == 'i')
 				keyI = 1;
-			if(keys[i] == 'k')
+			else if(keys[i] == 'k')
 				keyK = 1;
 		}
 	}
@@ -139,8 +142,8 @@ function update()
 		totalSteps++;
 	}
 	
-	selectOrbit(keyW, keyS);
-	movePlanets(keyA, keyD);
+	selectOrbit(keyW, keyS, keyI, keyK);
+	movePlanets(keyA, keyD, keyJ, keyL);
 	
 	var destroyData = [];
 	
@@ -192,8 +195,8 @@ function update()
 		debrisData.push({x: debris[i].bodyDef.position.x, y: debris[i].bodyDef.position.y, radius: debrisRadius, id: debris[i].id});
 	}
 	//destroyed items will have an "explode" flag set to true if they explode
-	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData});
-	while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
+	self.postMessage({gameStatus : 'update', asteroids: asteroidsData, destroyed: destroyData, planets: planetsData, debris: debrisData, orbitOne : currentOrbit, orbitTwo : currentOrbitTwo});
+while(destroyList.length > 0) world.DestroyBody(destroyList.pop());
 }
 
 function initWorld()
@@ -355,22 +358,36 @@ function generateAsteroids()
 	
 }
 
-function selectOrbit(keyW, keyS)
+function selectOrbit(keyW, keyS, keyI, keyK)
 {
-	if(keyW && currentOrbit != 3)
-		currentOrbit++;
-	else if(keyS && currentOrbit != 0)
-		currentOrbit--;
+	if(!isMultiplayer)
+	{
+		if(keyW && currentOrbit != 3)
+			currentOrbit++;
+		else if(keyS && currentOrbit != 0)
+			currentOrbit--;
+	}
+	else
+	{
+		if(keyW && currentOrbit != 2)
+			currentOrbit+=2;
+		else if(keyS && currentOrbit != 0)
+			currentOrbit-=2;
+		if(keyI && currentOrbitTwo != 3)
+			currentOrbit+=2;
+		else if(keyK && currentOrbitTwo != 1)
+			currentOrbit-=2;
+	}
 	for(var i = 0; i < 8; i++)
 	{
-		if(Math.floor(i/2) == currentOrbit)
+		if(Math.floor(i/2) == currentOrbit || (isMultiplayer && Math.floor(i/2) == currentOrbitTwo))
 			planets[i].selected = 1;
 		else
 			planets[i].selected = 0;
 	}
 }
 
-function movePlanets(keyA, keyD)
+function movePlanets(keyA, keyD, keyJ, keyL)
 {
 	for(var i = 0; i < planets.length; i++)
 	{
@@ -393,9 +410,39 @@ function movePlanets(keyA, keyD)
 			thrust += 0.1;
 		else if(thrust > 0)
 			thrust -= 0.1;
-		var angularVelocity = (planets[i].baseAngularVelocity + thrust*10);
-		planets[i].angle = planets[i].angle + angularVelocity;	
+		var angularVelocity = (planets[i].baseAngularVelocity + thrust*0.5);
+		planets[i].angle = planets[i].angle + angularVelocity;
+		if(isMultiplayer)
+		{
+			i++;
+		}
 	}
+	for(var i = 1; i < planets.length && isMultiplayer; i+=2)
+	{
+		if(planets[i].selected && (keyJ || keyL) && keyJ != keyL)
+		{
+			if(keyL)
+			{
+				thrustTwo += 0.2;
+				if(thrustTwo < -thrustCap)
+					thrustTwo = -thrustCap;
+			}
+			else if(keyJ)
+			{
+				thrustTwo -= 0.2;
+				if(thrustTwo < -thrustCap)
+					thrustTwo = -thrustCap;
+			}	
+		}
+		else if(thrustTwo < 0)
+			thrust += 0.1;
+		else if(thrustTwo > 0)
+			thrust -= 0.1;
+		var angularVelocity = (planets[i].baseAngularVelocity + thrustTwo*0.5);
+		planets[i].angle = planets[i].angle + angularVelocity;
+		
+	}
+	
 }
 
 function calculateDistance(a, b) { //returns distance between object a and object b
@@ -502,9 +549,9 @@ function Asteroid() {
 		this.bodyDef.linearVelocity.x =  -velocity;
 	
 	if (triangleHeight < 0)
-		this.bodyDef.linearVelocity.y = Math.abs(ratio) * velocity;
+		this.bodyDef.linearVelocity.y = ratio*velocity;
 	else
-		this.bodyDef.linearVelocity.y = Math.abs(ratio) * -velocity;
+		this.bodyDef.linearVelocity.y = -ratio*velocity;
 	
 	this.id = asteroidId;
 	this.body = world.CreateBody(this.bodyDef);
