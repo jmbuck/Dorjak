@@ -387,7 +387,7 @@ function selectOrbit(keyW, keyS, keyI, keyK)
 		}
 		else
 			keyHeldW = 0;
-		else if(keyS && !keyHeldS && currentOrbit != 0)
+		if(keyS && !keyHeldS && currentOrbit != 0)
 		{
 			currentOrbit--;
 			keyHeldS = 1;
