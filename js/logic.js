@@ -40,6 +40,7 @@ var world;
 var fps;
 var sunRadius = 50;
 var orbitSize = 2;
+var sunObject;
 
 self.onmessage = function(e)
 {
@@ -125,40 +126,65 @@ function generateAsteroids() {
 	 var minVel = Math.floor(baseVel / 2);
 	 var maxVel = Math.ceil(baseVel * 2);
 	 for(var i = 0; i < numAsteroids; i++) {
-		 var asteroidDef = new b2CircleDef();
-		 asteroidDef.radius = getRandomInt(minRadius, maxRadius);
-		 var asteroidBd = new b2BodyDef();
-		 asteroidBd.AddShape(asteroidDef);
+		var asteroidBd = new b2BodyDef; 
+		asteroidBd.type = b2Body.b2_dynamicBody;
+	
+		asteroidFixt = new b2FixtureDef;
+		asteroidFixt.shape = new b2CircleShape(getRandomInt(minRadius, maxRadius));
+		asteroidFixt.density = 1;
+	
 		  
 		 var side = getRandomInt(1, 4) //generate start position
 		 switch(side) {
 			 case 1: //left
-			 asteroidBd.position.Set(0, getRandomInt(0, screenHeight));
+			 asteroidBd.position.x = 0;
+			 asteroidBd.position.y = getRandomInt(0, screenHeight);
 			 break;
 			 case 2: //right
-			 asteroidBd.position.Set(screenWidth, getRandomInt(0, screenHeight));
+			 asteroidBd.position.x = 0;
+			 asteroidBd.position.y = getRandomInt(screenWidth, screenHeight);
 			 break;
-			 case 3: //top, will only come from left and right 15% of top screen
+			 case 3: //top
 				 var rand = getRandomInt(1, 100);
-				 if(rand <= 45) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth)), screenHeight);
-				 else if(rand <=90) asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), screenHeight);
-				 else asteroidBd.position.Set(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), screenHeight);
+				 if(rand <= 45) {
+					 asteroidBd.position.x = getRandomInt(0, Math.ceil(.15*screenWidth));
+					 asteroidBd.position.y = screenHeight;
+					 
+				 }
+				 else if(rand <=90) {
+					 asteroidBd.position.x = getRandomInt(Math.floor(.85*screenWidth), screenWidth);
+					 asteroidBd.position.y = screenHeight;
+				 }
+				 else {
+					 asteroidBd.position.x = getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth));
+					 asteroidBd.position.y = screenHeight;
+				 }
 			 break;
-			 case 4: //bottom, will only come from left and right 15% of bottom screen
+			 case 4: //bottom
 			 default:
 				var rand = getRandomInt(1, 100);
-				if(rand <= 45) asteroidBd.position.Set(getRandomInt(0, Math.ceil(.15*screenWidth)), 0);
-				else if(rand <=90) asteroidBd.position.Set(getRandomInt(Math.floor(.85*screenWidth), screenWidth), 0);
-				else asteroidBd.position.Set(getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth)), 0);
+				if(rand <= 45) {
+					asteroidBd.position.x = getRandomInt(0, Math.ceil(.15*screenWidth));
+					asteroidBd.position.y = 0;
+				}
+				else if(rand <=90) { 
+					asteroidBd.position.x = getRandomInt(Math.floor(.85*screenWidth), screenWidth);
+					asteroidBd.position.y = 0;
+				}
+				else {
+					asteroidBd.position.x = (getRandomInt(Math.floor(.15*screenWidth), Math.ceil(.85*screenWidth));
+					asteroidBd.position.y = 0;
+				}
 		 }
 		//generate velocity
-		var angle = calculateAngle(asteroidBd, sun); 
+		var asteroidBd.angle = calculateAngle(asteroidBd, sunObject); 
 		var velocity = getRandomInt(minVel, maxVel);
-		asteroidB.baseVelocity = velocity;
-		asteroidB.linearVelocity.Set(velocity*Math.cos(angle), velocity*Math.sin(angle)); 
+		asteroidBd.baseVelocity = velocity;
+		asteroidBd.linearVelocity.x = velocity*Math.cos(asteroidBd.angle);
+		asteroidBd.linearVeocity.y = velocity*Math.sin(asteroidBd.angle); 
 		
 		//add to world
-		asteroids.push(world.createBody(asteroidBd)); //add to array
+		asteroids.push(world.createBody(asteroidBd).createFixture(asteroidFixt); //add to array
 	 }
 	
 }
@@ -183,18 +209,14 @@ function movePlanets()
 	}
 }
 
-
-
-
-
 function calculateDistance(a, b) { //returns distance between object a and object b
 	return Math.sqrt((a.m_position.x - b.m_position.x)*(a.m_position.x - b.m_position.x)+
 					  (a.m_position.y - b.m_position.y)*(a.m_position.y - b.m_position.y));
 }
 
-function calculateAngle(current, target) {
-	var triangleHeight = current.m_position.y - target.m_position.y;
-	var triangleBase = current.m_position.x - target.m_position.x;
+function calculateAngle(current, target) { //returns angle to sun in radians
+	var triangleHeight = current.position.y - target.bodyDef.position.y;
+	var triangleBase = current.position.x - target.bodyDef.position.x;
 	return Math.atan(triangleBase/triangleHeight);
 }
 
