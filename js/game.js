@@ -294,24 +294,6 @@ game.prototype.draw = function()
 	{
 		this.renderObjects[i].draw(this.ctx);
 	}
-	
-	var time = Date.now();
-	
-	this.ctx.beginPath();
-	for(var i = 0; i < this.points; i++)
-	{
-		if(this.points[i].time - time < 0)
-		{
-			this.points.splace(i, 1);
-			i--;
-		}
-		else
-		{
-			this.ctx.fillStyle = this.points[i].rgba;
-			this.ctx.rect(this.points[i].x, this.points[i].y, this.points[i].size, this.points[i].size);
-			this.ctx.fill();
-		}
-	}
 }
 
 game.prototype.handleEvent = function(e)
@@ -366,6 +348,8 @@ game.prototype.handleEvent = function(e)
 		for(var i = 0; i < e.data.asteroids.length; i++)
 		{
 			e.data.asteroids[i].sun = gameSession.renderObjects[0];
+			e.data.asteroids[i].x *= gameSession.scaleWidth;
+			e.data.asteroids[i].y *= gameSession.scaleHeight;
 			gameSession.renderObjects.push(new asteroid(e.data.asteroids[i]));
 		}
 		
@@ -470,13 +454,18 @@ function sun(data)
 
 sun.prototype.draw = function(ctx)
 {
-	ctx.lineWidth = .5;
+	ctx.lineWidth = 1;
 	ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.arc(this.x + Math.random(), this.y + Math.random(), this.radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = 'orange';
     ctx.fill();
     ctx.strokeStyle = 'black';
     ctx.stroke();
+	
+	ctx.arc(this.x + Math.random() * 3, this.y + Math.random() * 3, this.radius, 0, 2 * Math.PI, false);
+	ctx.fillStyle = 'orange';
+	ctx.fill();
+	ctx.stroke();
 }
 
 function orbit(data)
@@ -524,6 +513,9 @@ planet.prototype.draw = function(ctx)
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 1.5;
 	ctx.stroke();
+	
+	ctx.arc(this.sun.x + (this.sun.radius + this.radius) * Math.cos(this.arc) + (Math.random() * 3), this.sun.y + (this.sun.radius + this.radius) * Math.sin(this.arc) + (Math.random() * 3), this.size, 0, Math.PI * 2);
+	ctx.stroke();
 }
 
 function asteroid(data)
@@ -555,6 +547,4 @@ asteroid.prototype.draw = function(ctx)
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 2;
 	ctx.stroke();
-	var color = "rgba(" (Math.random() * 255) + "," (Math.random() * 255) + "," + (Math.random() * 255) + ", 255)";
-	gameSession.points.push({x : this.x, y : this.y, size : Math.random() * 2 + .5, rgba = color});
 }
