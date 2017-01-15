@@ -33,6 +33,7 @@ function menu()
 	
 	this.scaleWidth = this.scaleHeight = 1;
 	this.timeElapsed = 0;
+	this.timeElapsed1 = 0;
 	
 	this.width = 0;
 	this.height = 0;
@@ -74,26 +75,29 @@ menu.prototype.mouseMove = function(e)
 	{
 		if(e.pageY < 300 + gameSession.height / 15 && e.pageY > 300 - gameSession.height / 10)
 		{
+			gameSession.timeElapsed1 = 0;
 			gameSession.timeElapsed++;
+			return;
+		}
+		if(e.pageY < 400 + gameSession.height / 15 && e.pageY > 400 - gameSession.height / 10)
+		{
+			gameSession.timeElapsed = 0;
+			gameSession.timeElapsed1++;
 			return;
 		}
 	}
 	gameSession.timeElapsed = 0;
+	gameSession.timeElapsed1 = 0;
 }
 
 menu.prototype.mouseClick = function(e)
 {
 	if(gameSession.timeElapsed > 0)
 	{
-		gameSession.changeGui();
-	}
-}
-
-menu.prototype.changeGui = function()
-{
-	gameSession = new game();
+		gameSession = new game();
 	
-	gameSession.init();
+		gameSession.init();
+	}
 }
 
 menu.prototype.tick = function()
@@ -117,9 +121,14 @@ menu.prototype.tick = function()
 	this.ctx.fillStyle = 'white';
 	this.ctx.font = '48px game';
 	this.ctx.strokeText("Let's Start", this.width / 2, 300);
+	this.ctx.strokeText("Bring a Pal", this.width / 2, 400);
 	if(this.timeElapsed > 0)
 	{
 		this.ctx.strokeText("Let's Start", this.width / 2 + Math.random() * 3, 300 + Math.random() * 3);
+	}
+	if(this.timeElapsed1 > 0)
+	{
+		this.ctx.strokeText("Bring a Pal", this.width / 2 + Math.random() * 3, 400 + Math.random() * 3);
 	}
 		
 	this.timer = setTimeout( function() { gameSession.tick(); } , 1000 / this.fps);
