@@ -8,3 +8,6 @@ Simply put, you are not going to defend the sun forever! Instead, just try your 
 P1 = Player One, P2 = Player Two, - = Key binding for action
 
 P1-W, P2-I: Adjust selected orbit outwards by one ring P1-S, P2-K: Adjust selected orbit inwards by one ring P1-A, P2-J: Accelerate orbit counter-clockwise P1-D, P2-L: Accelerate orbit clockwise
+
+#About
+This project was developed in 24 hours for UChicago's UncommonHacks hackathon. This was our first experience with JavaScript; none of us had ever used it before! This of course came with challenges, but a lot of the legwork physics-wise was handled by a great engine called Box2D. The engine allowed us to create shapes with various characteristics with ease, reducing the work load and allowing us to focus on other parts of the code.
