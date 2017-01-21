@@ -508,7 +508,7 @@ function Asteroid() {
 	else
 		this.bodyDef.linearVelocity.x = -velocity;
 	if (triangleHeight < 0)
-		this.bodyDef.linearVelocity.y = ratio * velocity;
+		this.bodyDef.linearVelocity.y = Math.abs(ratio) * velocity;
 	else
 		this.bodyDef.linearVelocity.y = -Math.abs(ratio) * velocity;
 	
